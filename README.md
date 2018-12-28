@@ -35,7 +35,7 @@ FlutterBugly.init("your app id");
 
 ```
 
-四、支持属性
+四、支持属性（Android）
 -----
 ```
  bool autoCheckUpgrade = true,//自动检查更新开关
@@ -49,7 +49,7 @@ FlutterBugly.init("your app id");
      bool isSilence = false,//是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
  })
 ```
-五、自定义弹窗
+五、自定义弹窗（Android）
 ------
 通过FlutterBugly.getUpgradeInfo()获取更新策略信息填入自定义flutter widget，手动弹窗
 
@@ -72,7 +72,7 @@ UpgradeInfo参数：
 
 ```
 
-六、说明
+六、说明（Android）
 -------
 目前已知问题
 
