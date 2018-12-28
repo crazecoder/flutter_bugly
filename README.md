@@ -52,7 +52,8 @@ FlutterBugly.init("your app id");
 五、自定义弹窗
 ------
 通过FlutterBugly.getUpgradeInfo()获取更新策略信息填入自定义flutter widget，手动弹窗
-#####UpgradeInfo参数：
+
+UpgradeInfo参数：
 ```
   String id = "";//唯一标识
   String title = "";//升级提示标题
