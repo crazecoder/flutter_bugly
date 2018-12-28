@@ -13,7 +13,7 @@ class FlutterBugly {
     String appId, {
     bool autoCheckUpgrade = true,
     bool autoDownloadOnWifi = false,
-    bool enableNotification = false,//官方没有适配8.0，配合targetSdkVersion使用
+    bool enableNotification = false, //官方没有适配8.0，配合targetSdkVersion使用
     int initDelay = 0, //单位秒
   }) async {
     Map<String, Object> map = {
@@ -34,8 +34,10 @@ class FlutterBugly {
     return info;
   }
 
-  static Future<Null> checkUpgrade(
-      {bool isManual = false, bool isSilence = false}) async {
+  static Future<Null> checkUpgrade({
+    bool isManual = false,
+    bool isSilence = false,
+  }) async {
     Map<String, Object> map = {
       "isManual": isManual,
       "isSilence": isSilence,
