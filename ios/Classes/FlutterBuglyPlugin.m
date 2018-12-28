@@ -1,4 +1,5 @@
 #import "FlutterBuglyPlugin.h"
+#import <Bugly/Bugly.h>
 
 @implementation FlutterBuglyPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -10,8 +11,11 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if ([@"getPlatformVersion" isEqualToString:call.method]) {
-    result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
+  if ([@"initBugly" isEqualToString:call.method]) {
+    NSString *appId = call.arguments[@"appId"];
+    [Bugly startWithAppId:appId];
+      NSLog(@"Bugly appId: %@", appId);
+    result(@"Bugly 初始化成功");
   } else {
     result(FlutterMethodNotImplemented);
   }

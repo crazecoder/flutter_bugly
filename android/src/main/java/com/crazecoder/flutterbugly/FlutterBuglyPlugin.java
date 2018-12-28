@@ -48,7 +48,6 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 if (call.hasArgument("enableNotification")) {
                     Beta.enableNotification = call.argument("enableNotification");
                 }
-                Log.d("init",call.argument("appId").toString());
                 Bugly.init(context.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
                 result.success("Bugly 初始化成功");
 
