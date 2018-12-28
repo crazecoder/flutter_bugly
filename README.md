@@ -52,7 +52,8 @@ FlutterBugly.init("your app id");
 五、自定义弹窗
 ------
 通过FlutterBugly.getUpgradeInfo()获取更新策略信息填入自定义flutter widget，手动弹窗
-#####UpgradeInfo参数：
+
+UpgradeInfo参数：
 ```
   String id = "";//唯一标识
   String title = "";//升级提示标题
@@ -73,7 +74,9 @@ FlutterBugly.init("your app id");
 
 六、说明
 -------
-###目前已知问题
-#####1、第一次接受到更新策略之后，不会弹窗，即使手动检查更新也不会，需要退出app之后再进入，才会有弹窗
-#####2、官方没有适配8.0的notification，所以如果需要用到notification的时候请关闭后（默认关闭），自己写相关业务逻辑，或者直接把gradle里的targetSdkVersion设成26以下
+目前已知问题
+
+1、第一次接受到更新策略之后，不会弹窗，即使手动检查更新也不会，需要退出app之后再进入，才会有弹窗
+
+2、官方没有适配8.0的notification，所以如果需要用到notification的时候请关闭后（默认关闭），自己写相关业务逻辑，或者直接把gradle里的targetSdkVersion设成26以下
 
