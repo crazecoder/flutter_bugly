@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bugly/flutter_bugly.dart';
 
@@ -14,7 +16,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    FlutterBugly.init("you app id",autoDownloadOnWifi: true);
+    FlutterBugly.init("you app id", autoDownloadOnWifi: true);
   }
 
   @override
@@ -25,11 +27,13 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: GestureDetector(
-          onTap: (){
-            FlutterBugly.getUpgradeInfo().then((_info){
-              print("------------------${_info?.title}");
-            });
-            FlutterBugly.checkUpgrade();
+          onTap: () {
+            if (Platform.isAndroid){
+              FlutterBugly.getUpgradeInfo().then((_info) {
+                print("------------------${_info?.title}");
+              });
+              FlutterBugly.checkUpgrade();
+            }
           },
           child: Center(
             child: Text('Running on: $_platformVersion\n'),
