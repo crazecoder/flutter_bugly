@@ -35,6 +35,9 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
     public void onMethodCall(final MethodCall call, final Result result) {
         if (call.method.equals("initBugly")) {
             if (call.hasArgument("appId")) {
+                if (call.hasArgument("enableHotfix")) {
+                    Beta.enableHotfix = call.argument("enableHotfix");
+                }
                 if (call.hasArgument("autoCheckUpgrade")) {
                     Beta.autoCheckUpgrade = call.argument("autoCheckUpgrade");
                 }
