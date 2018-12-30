@@ -26,6 +26,7 @@ public class MapUtil {
                                   Map<String, Object> map,
                                   String prefix)
             throws IllegalAccessException {
+        if (bean == null) return;
         Class<?> cls = bean.getClass();
 
         for (Field field : cls.getDeclaredFields()) {
@@ -51,9 +52,9 @@ public class MapUtil {
 
     private static final Set<Class<?>> VALUE_CLASSES =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                    Object.class,    String.class, Boolean.class,
-                    Character.class, Byte.class,   Short.class,
-                    Integer.class,   Long.class,   Float.class,
+                    Object.class, String.class, Boolean.class,
+                    Character.class, Byte.class, Short.class,
+                    Integer.class, Long.class, Float.class,
                     Double.class
                     // etc.
             )));

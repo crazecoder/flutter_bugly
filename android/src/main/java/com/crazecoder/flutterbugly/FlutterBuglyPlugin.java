@@ -1,6 +1,11 @@
 package com.crazecoder.flutterbugly;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.tencent.bugly.Bugly;
@@ -17,10 +22,24 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  * FlutterBuglyPlugin
  */
 public class FlutterBuglyPlugin implements MethodCallHandler {
-    private Context context;
+    private Activity activity;
 
-    public FlutterBuglyPlugin(Context context) {
-        this.context = context;
+    private static final String[] PERMISSIONS_BUGLY = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.READ_LOGS,
+            Manifest.permission.REQUEST_INSTALL_PACKAGES,
+    };
+
+    public FlutterBuglyPlugin(Activity activity) {
+        this.activity = activity;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            ActivityCompat.requestPermissions(activity,
+                    PERMISSIONS_BUGLY,
+                    0);
     }
 
     /**
@@ -51,7 +70,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 if (call.hasArgument("enableNotification")) {
                     Beta.enableNotification = call.argument("enableNotification");
                 }
-                Bugly.init(context.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
+                Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
                 result.success("Bugly 初始化成功");
 
             } else {
