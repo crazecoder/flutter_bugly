@@ -70,6 +70,16 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 if (call.hasArgument("enableNotification")) {
                     Beta.enableNotification = call.argument("enableNotification");
                 }
+                if (call.hasArgument("upgradeCheckPeriod")) {
+                    int period = call.argument("upgradeCheckPeriod");
+                    Beta.upgradeCheckPeriod = period * 1000;
+                }
+                if (call.hasArgument("showInterruptedStrategy")) {
+                    Beta.showInterruptedStrategy = call.argument("showInterruptedStrategy");
+                }
+                if (call.hasArgument("canShowApkInfo")) {
+                    Beta.canShowApkInfo = call.argument("canShowApkInfo");
+                }
                 Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
                 result.success("Bugly 初始化成功");
 

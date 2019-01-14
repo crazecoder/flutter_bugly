@@ -41,7 +41,11 @@ FlutterBugly.init("your app id");
  bool autoCheckUpgrade = true,//自动检查更新开关
  bool autoDownloadOnWifi = false,//设置Wifi下自动下载
  bool enableNotification = false,//官方没有适配8.0，配合targetSdkVersion使用
+ bool showInterruptedStrategy = true, //设置开启显示打断策略
+ bool canShowApkInfo = true, //设置是否显示弹窗中的apk信息
  int initDelay = 0, //延迟初始化，单位秒
+ int upgradeCheckPeriod = 0, //升级检查周期设置,单位秒
+ 
  
  //手动检查更新
  checkUpgrade({
