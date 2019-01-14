@@ -18,7 +18,7 @@ class FlutterBugly {
     bool showInterruptedStrategy = true, //设置开启显示打断策略
     bool canShowApkInfo = true, //设置是否显示弹窗中的apk信息
     int initDelay = 0, //延迟初始化,单位秒
-    int upgradeCheckPeriod = 0, //升级检查周期设置,单位秒
+    int upgradeCheckPeriod = 60, //升级检查周期设置,单位秒
   }) async {
     Map<String, Object> map = {
       "appId": appId,

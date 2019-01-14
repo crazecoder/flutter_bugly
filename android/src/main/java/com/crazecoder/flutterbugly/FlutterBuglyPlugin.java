@@ -80,6 +80,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 if (call.hasArgument("canShowApkInfo")) {
                     Beta.canShowApkInfo = call.argument("canShowApkInfo");
                 }
+                Beta.canShowUpgradeActs.add(activity.getClass());
                 Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
                 result.success("Bugly 初始化成功");
 
