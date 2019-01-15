@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -9,8 +10,9 @@ class FlutterBugly {
 
   static const MethodChannel _channel = const MethodChannel('flutter_bugly');
 
-  static Future<String> init(
-    String appId, {
+  static Future<String> init({
+    String androidAppId,
+    String iOSAppId,
     bool autoCheckUpgrade = true,
     bool autoDownloadOnWifi = false,
     bool enableHotfix = false,
@@ -20,8 +22,10 @@ class FlutterBugly {
     int initDelay = 0, //延迟初始化,单位秒
     int upgradeCheckPeriod = 60, //升级检查周期设置,单位秒
   }) async {
+    assert((Platform.isAndroid && androidAppId != null) ||
+        (Platform.isIOS && iOSAppId != null));
     Map<String, Object> map = {
-      "appId": appId,
+      "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "autoCheckUpgrade": autoCheckUpgrade,
       "autoDownloadOnWifi": autoDownloadOnWifi,
       "enableHotfix": enableHotfix,

@@ -16,7 +16,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    FlutterBugly.init("you app id", autoDownloadOnWifi: true,upgradeCheckPeriod: 5,enableNotification: true).then((_result){
+    FlutterBugly.init(androidAppId:"your android app id",iOSAppId: "your iOS app id", autoDownloadOnWifi: true,upgradeCheckPeriod: 5,enableNotification: true).then((_result){
       setState(() {
         _platformVersion = _result;
       });
