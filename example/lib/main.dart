@@ -16,7 +16,11 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    FlutterBugly.init("you app id", autoDownloadOnWifi: true);
+    FlutterBugly.init("you app id", autoDownloadOnWifi: true,upgradeCheckPeriod: 5,enableNotification: true).then((_result){
+      setState(() {
+        _platformVersion = _result;
+      });
+    });
   }
 
   @override
@@ -29,14 +33,14 @@ class _MyAppState extends State<MyApp> {
         body: GestureDetector(
           onTap: () {
             if (Platform.isAndroid){
+              FlutterBugly.checkUpgrade();
               FlutterBugly.getUpgradeInfo().then((_info) {
                 print("------------------${_info?.title}");
               });
-              FlutterBugly.checkUpgrade();
             }
           },
           child: Center(
-            child: Text('Running on: $_platformVersion\n'),
+            child: Text('init result: $_platformVersion\n'),
           ),
         ),
       ),
