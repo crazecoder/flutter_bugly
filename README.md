@@ -31,7 +31,7 @@ flutter_bugly:
 ```
 import 'package:flutter_bugly/flutter_bugly.dart';
 
-FlutterBugly.init("your app id");
+FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id");
 
 ```
 
