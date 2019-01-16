@@ -87,6 +87,9 @@ UpgradeInfo参数：
 
 1、flutter异常上报不属于崩溃，所以如需查看flutter的异常上报，请在【错误分析】tab页查看
 
+<img src="https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/screenshot/crash.png" width="50%" height="50%" />
+
+
 2、iOS的异常上报没有过多测试，如出现问题请issue
 
 目前已知问题
