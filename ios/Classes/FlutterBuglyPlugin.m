@@ -16,7 +16,21 @@
     [Bugly startWithAppId:appId];
       NSLog(@"Bugly appId: %@", appId);
     result(@"Bugly 初始化成功");
-  } else {
+  }else if([@"postCatchedException" isEqualToString:call.method]){
+      NSString *crash_detail = call.arguments[@"crash_detail"];
+      NSString *crash_message = call.arguments[@"crash_message"];
+      if (crash_detail == nil || crash_detail == NULL) {
+         crash_message = @"";
+      }
+      if ([crash_detail isKindOfClass:[NSNull class]]) {
+          crash_message = @"";
+      }
+      NSException* ex = [[NSException alloc]initWithName:crash_message
+                                                  reason:crash_detail
+                                                userInfo:nil];
+      [Bugly reportException:ex];
+      result(nil);
+  }else {
     result(FlutterMethodNotImplemented);
   }
 }

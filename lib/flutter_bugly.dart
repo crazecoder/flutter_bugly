@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'bean/upgrade_info.dart';
@@ -55,5 +56,39 @@ class FlutterBugly {
       "isSilence": isSilence, //是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
     };
     await _channel.invokeMethod('checkUpgrade', map);
+  }
+
+  static void postCatchedException<T>(T callback(), {bool useLog = false}) {
+    var map = {};
+    // This captures errors reported by the Flutter framework.
+    FlutterError.onError = (FlutterErrorDetails details) async {
+      if (useLog) {
+        // In development mode simply print to console.
+        FlutterError.dumpErrorToConsole(details);
+      } else {
+        Zone.current.handleUncaughtError(details.exception, details.stack);
+      }
+    };
+
+    // This creates a [Zone] that contains the Flutter application and stablishes
+    // an error handler that captures errors and reports them.
+    //
+    // Using a zone makes sure that as many errors as possible are captured,
+    // including those thrown from [Timer]s, microtasks, I/O, and those forwarded
+    // from the `FlutterError` handler.
+    //
+    // More about zones:
+    //
+    // - https://api.dartlang.org/stable/1.24.2/dart-async/Zone-class.html
+    // - https://www.dartlang.org/articles/libraries/zones
+    runZoned<Future<Null>>(() async {
+      callback();
+    }, onError: (error, stackTrace) async {
+      map.putIfAbsent("crash_message", ()=>error.toString());
+      map.putIfAbsent("crash_detail", ()=>stackTrace.toString());
+      await _channel.invokeMethod(
+        'postCatchedException',map
+      );
+    });
   }
 }

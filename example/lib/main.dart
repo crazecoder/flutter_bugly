@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bugly/flutter_bugly.dart';
 
-void main() => runApp(MyApp());
+void main()=>FlutterBugly.postCatchedException((){
+  runApp(MyApp());
+});
 
 class MyApp extends StatefulWidget {
   @override
@@ -16,7 +18,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    FlutterBugly.init(androidAppId:"your android app id",iOSAppId: "your iOS app id", autoDownloadOnWifi: true,upgradeCheckPeriod: 5,enableNotification: true).then((_result){
+    FlutterBugly.init(
+      androidAppId: "your app id",
+      iOSAppId: "your app id",
+    ).then((_result) {
       setState(() {
         _platformVersion = _result;
       });
@@ -32,7 +37,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: GestureDetector(
           onTap: () {
-            if (Platform.isAndroid){
+            if (Platform.isAndroid) {
               FlutterBugly.checkUpgrade();
               FlutterBugly.getUpgradeInfo().then((_info) {
                 print("------------------${_info?.title}");

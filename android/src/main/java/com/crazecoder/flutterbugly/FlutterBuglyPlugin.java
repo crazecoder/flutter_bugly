@@ -2,15 +2,26 @@ package com.crazecoder.flutterbugly;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
+import android.text.TextUtils;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 
 import com.tencent.bugly.Bugly;
+import com.tencent.bugly.BuglyStrategy;
+import com.tencent.bugly.CrashModule;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
+import com.tencent.bugly.crashreport.CrashReport;
+import com.tencent.bugly.crashreport.crash.CrashDetailBean;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -101,6 +112,46 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         } else if (call.method.equals("upgradeListener")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
             result.success(JsonUtil.toJson(MapUtil.deepToMap(strategy)));
+        } else if (call.method.equals("postCatchedException")) {
+            String message = "";
+            String detail = null;
+            if (call.hasArgument("crash_message")) {
+                message = call.argument("crash_message");
+            }
+            if (call.hasArgument("crash_detail")) {
+                detail = call.argument("crash_detail");
+            }
+            if (TextUtils.isEmpty(detail)) return;
+            String[] details = detail.split("#");
+            List<StackTraceElement> elements = new ArrayList<>();
+            for (String s : details) {
+                if (!TextUtils.isEmpty(s)) {
+                    String methodName = null;
+                    String fileName = null;
+                    int lineNum = -1;
+                    String[] contents = s.split(" \\(");
+                    if (contents.length > 0) {
+                        methodName = contents[0];
+                        String packageContent = contents[1].replace(")", "");
+                        String[] packageContentArray = packageContent.split("\\.dart:");
+                        if (packageContentArray.length > 0 ) {
+                            if (packageContentArray.length == 1) {
+                                fileName = packageContentArray[0];
+                            }else {
+                                fileName = packageContentArray[0] + ".dart";
+                                lineNum = Integer.parseInt(packageContentArray[1].split(":")[0]);
+                            }
+                        }
+                    }
+                    StackTraceElement element = new StackTraceElement("Dart", methodName, fileName, lineNum);
+                    elements.add(element);
+                }
+            }
+            StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
+            Throwable throwable = new Throwable(message);
+            throwable.setStackTrace(elements.toArray(elementsArray));
+            CrashReport.postCatchedException(throwable);
+            result.success(null);
         } else {
             result.notImplemented();
         }
