@@ -1,7 +1,7 @@
 # flutter_bugly
 腾讯Bugly flutter应用更新插件
 
-# 目前支持Android（更新统计和原生异常上报）、iOS（统计和原生异常上报）
+# 目前支持Android（更新统计、原生异常上报、flutter异常上报）、iOS（统计、原生异常上报、flutter异常上报）
 
 ---
 
@@ -30,6 +30,11 @@ flutter_bugly:
 ----
 ```
 import 'package:flutter_bugly/flutter_bugly.dart';
+
+//使用flutter异常上报
+void main()=>FlutterBugly.postCatchedException((){
+  runApp(MyApp());
+});
 
 FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id");
 
@@ -78,6 +83,11 @@ UpgradeInfo参数：
 
 六、说明（Android）
 -------
+异常上报说明
+
+1、flutter异常上报不属于崩溃，所以如需查看flutter的异常上报，请在【错误分析】tab页查看
+2、iOS的异常上报没有过多测试，如出现问题请issue
+
 目前已知问题
 
 ~~1、第一次接受到更新策略之后，不会弹窗，即使手动检查更新也不会，需要退出app之后再进入，才会有弹窗（已解决）~~
