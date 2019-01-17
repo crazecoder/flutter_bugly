@@ -9,7 +9,7 @@
 
 一、引入
 --
-```
+```yaml
 //androidx
 dependencies:
   flutter_bugly:
