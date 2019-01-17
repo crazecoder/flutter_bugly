@@ -17,7 +17,7 @@ flutter_bugly:
 ---
 在android/app/build.gradle的android下加入
 
-```
+```gradle
     defaultConfig {
         ndk {
             //设置支持的SO库架构
@@ -42,7 +42,7 @@ FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id
 
 四、支持属性（Android）
 -----
-```
+```dart
  bool autoCheckUpgrade = true,//自动检查更新开关
  bool autoDownloadOnWifi = false,//设置Wifi下自动下载
  bool enableNotification = false,//官方没有适配8.0，配合targetSdkVersion使用
@@ -63,7 +63,7 @@ FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id
 通过FlutterBugly.getUpgradeInfo()获取更新策略信息填入自定义flutter widget，手动弹窗
 
 UpgradeInfo参数：
-```
+```java
   String id = "";//唯一标识
   String title = "";//升级提示标题
   String newFeature = "";//升级特性描述
