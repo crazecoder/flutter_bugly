@@ -1,4 +1,6 @@
-# flutter_bugly
+# flutter_bugly [![pub package](https://img.shields.io/pub/v/flutter_bugly.svg)](https://pub.dartlang.org/packages/flutter_bugly)
+
+
 腾讯Bugly flutter应用更新插件
 
 # 目前支持Android（更新统计、原生异常上报、flutter异常上报）、iOS（统计、原生异常上报、flutter异常上报）
@@ -8,9 +10,15 @@
 一、引入
 --
 ```
-flutter_bugly:
-   git:
-     url: git://github.com/crazecoder/flutter_bugly.git
+//androidx
+dependencies:
+  flutter_bugly:
+    git:
+      url: git://github.com/crazecoder/flutter_bugly.git
+      
+//support 
+dependencies:
+  flutter_bugly: ^0.1.1
 ```
 
 二、项目配置
