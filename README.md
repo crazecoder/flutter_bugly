@@ -28,7 +28,7 @@ flutter_bugly:
 
 三、使用
 ----
-```
+```dart
 import 'package:flutter_bugly/flutter_bugly.dart';
 
 //使用flutter异常上报
