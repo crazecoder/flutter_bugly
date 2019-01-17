@@ -48,7 +48,18 @@ FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id
 
 ```
 
-四、支持属性（Android）
+四、release打包（Android）
+-----
+64-bit
+```
+flutter build apk --release --target-platform android-arm64
+```
+32-bit
+```
+flutter build apk --release --target-platform android-arm
+```
+
+五、支持属性（Android）
 -----
 ```dart
  bool autoCheckUpgrade = true,//自动检查更新开关
@@ -66,7 +77,7 @@ FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id
      bool isSilence = false,//是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
  })
 ```
-五、自定义弹窗（Android）
+六、自定义弹窗（Android）
 ------
 通过FlutterBugly.getUpgradeInfo()获取更新策略信息填入自定义flutter widget，手动弹窗
 
@@ -89,13 +100,13 @@ UpgradeInfo参数：
 
 ```
 
-六、说明（Android）
+七、说明（Android）
 -------
 异常上报说明
 
 1、flutter异常上报不属于崩溃，所以如需查看flutter的异常上报，请在【错误分析】tab页查看
 
-[preview]: https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/screenshot/crash.png
+![](https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/screenshot/crash.png)
 
 
 2、iOS的异常上报没有过多测试，如出现问题请issue
