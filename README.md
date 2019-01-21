@@ -3,7 +3,7 @@
 
 腾讯Bugly flutter应用更新插件
 
-# 目前支持Android（更新统计、原生异常上报、flutter异常上报）、iOS（统计、原生异常上报、flutter异常上报）
+## 支持Android/iOS 运营统计、原生异常上报、flutter异常上报、应用更新
 
 ---
 
