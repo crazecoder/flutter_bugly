@@ -3,25 +3,18 @@ package com.crazecoder.flutterbugly;
 import android.Manifest;
 import android.app.Activity;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
-
 import com.tencent.bugly.Bugly;
-import com.tencent.bugly.BuglyStrategy;
-import com.tencent.bugly.CrashModule;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.crashreport.CrashReport;
-import com.tencent.bugly.crashreport.crash.CrashDetailBean;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -47,10 +40,24 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
 
     public FlutterBuglyPlugin(Activity activity) {
         this.activity = activity;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            ActivityCompat.requestPermissions(activity,
-                    PERMISSIONS_BUGLY,
-                    0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!hasPermissions()) {
+                ActivityCompat.requestPermissions(activity,
+                        PERMISSIONS_BUGLY,
+                        0);
+            }
+        }
+    }
+    private boolean hasPermissions() {
+        for (String permission:PERMISSIONS_BUGLY){
+            if(!hasPermission(permission)){
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean hasPermission(String permission) {
+        return ContextCompat.checkSelfPermission(activity,permission) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     /**
@@ -134,10 +141,10 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                         methodName = contents[0];
                         String packageContent = contents[1].replace(")", "");
                         String[] packageContentArray = packageContent.split("\\.dart:");
-                        if (packageContentArray.length > 0 ) {
+                        if (packageContentArray.length > 0) {
                             if (packageContentArray.length == 1) {
                                 fileName = packageContentArray[0];
-                            }else {
+                            } else {
                                 fileName = packageContentArray[0] + ".dart";
                                 lineNum = Integer.parseInt(packageContentArray[1].split(":")[0]);
                             }
