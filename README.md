@@ -1,16 +1,24 @@
-# flutter_bugly
+# flutter_bugly [![pub package](https://img.shields.io/pub/v/flutter_bugly.svg)](https://pub.dartlang.org/packages/flutter_bugly)
+
+
 腾讯Bugly flutter应用更新插件
 
-# 目前支持Android（更新统计、原生异常上报、flutter异常上报）、iOS（统计、原生异常上报、flutter异常上报）
+## 支持Android/iOS 运营统计、原生异常上报、flutter异常上报、应用更新
 
 ---
 
 一、引入
 --
-```
-flutter_bugly:
-   git:
-     url: git://github.com/crazecoder/flutter_bugly.git
+```yaml
+//androidx
+dependencies:
+  flutter_bugly:
+    git:
+      url: git://github.com/crazecoder/flutter_bugly.git
+      
+//support 
+dependencies:
+  flutter_bugly: ^0.1.1
 ```
 
 二、项目配置
@@ -50,7 +58,6 @@ flutter build apk --release --target-platform android-arm64
 ```
 flutter build apk --release --target-platform android-arm
 ```
-
 
 五、支持属性（Android）
 -----
@@ -99,7 +106,7 @@ UpgradeInfo参数：
 
 1、flutter异常上报不属于崩溃，所以如需查看flutter的异常上报，请在【错误分析】tab页查看
 
-[preview]: https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/screenshot/crash.png
+![](https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/screenshot/crash.png)
 
 
 2、iOS的异常上报没有过多测试，如出现问题请issue
