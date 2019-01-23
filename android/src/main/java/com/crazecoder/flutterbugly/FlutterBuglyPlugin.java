@@ -3,6 +3,9 @@ package com.crazecoder.flutterbugly;
 import android.Manifest;
 import android.app.Activity;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 
 import com.tencent.bugly.Bugly;
@@ -13,9 +16,6 @@ import com.tencent.bugly.crashreport.CrashReport;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
