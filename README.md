@@ -18,7 +18,7 @@ dependencies:
       
 //support 
 dependencies:
-  flutter_bugly: ^0.1.1
+  flutter_bugly: lastVersion
 ```
 
 二、项目配置
