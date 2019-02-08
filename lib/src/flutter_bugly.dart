@@ -58,13 +58,16 @@ class FlutterBugly {
     await _channel.invokeMethod('checkUpgrade', map);
   }
 
-  static void postCatchedException<T>(T callback(), {bool useLog = false}) {
+  static void postCatchedException<T>(T callback(),
+      {bool useLog = false, FlutterExceptionHandler handler}) {
     var map = {};
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (FlutterErrorDetails details) async {
-      if (useLog) {
+      if (useLog || handler != null) {
         // In development mode simply print to console.
-        FlutterError.dumpErrorToConsole(details);
+        handler == null
+            ? FlutterError.dumpErrorToConsole(details)
+            : handler(details);
       } else {
         Zone.current.handleUncaughtError(details.exception, details.stack);
       }
@@ -84,11 +87,9 @@ class FlutterBugly {
     runZoned<Future<Null>>(() async {
       callback();
     }, onError: (error, stackTrace) async {
-      map.putIfAbsent("crash_message", ()=>error.toString());
-      map.putIfAbsent("crash_detail", ()=>stackTrace.toString());
-      await _channel.invokeMethod(
-        'postCatchedException',map
-      );
+      map.putIfAbsent("crash_message", () => error.toString());
+      map.putIfAbsent("crash_detail", () => stackTrace.toString());
+      await _channel.invokeMethod('postCatchedException', map);
     });
   }
 }
