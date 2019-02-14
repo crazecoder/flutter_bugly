@@ -15,6 +15,8 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -146,7 +148,12 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                                 fileName = packageContentArray[0];
                             } else {
                                 fileName = packageContentArray[0] + ".dart";
-                                lineNum = Integer.parseInt(packageContentArray[1].split(":")[0]);
+                                Pattern patternTrace = Pattern.compile("[1-9]\\d*");
+                                Matcher m = patternTrace.matcher(packageContentArray[1]);
+                                if (m.find()) {
+                                    String lineNumStr = m.group();
+                                    lineNum = Integer.parseInt(lineNumStr);
+                                }
                             }
                         }
                     }
