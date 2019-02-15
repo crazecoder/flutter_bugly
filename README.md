@@ -117,3 +117,5 @@ UpgradeInfo参数：
 
 2、官方没有适配8.0的notification，所以如果需要用到notification的时候请关闭后（默认关闭），自己写相关业务逻辑，或者直接把gradle里的targetSdkVersion设成26以下（方法见示例）
 
+3、请勿在targetSdkVersion 26以上设置autoDownloadOnWifi = true，会导致在8.0以上机型更新策略没有反应
+
