@@ -10,15 +10,17 @@
 一、引入
 --
 ```yaml
-//androidx
+//因为大部分主流插件都已升级androidx，所以pub库升级androidx
+//androidx 
+dependencies:
+  flutter_bugly: lastVersion
+  
+//support
 dependencies:
   flutter_bugly:
     git:
       url: git://github.com/crazecoder/flutter_bugly.git
-      
-//support 
-dependencies:
-  flutter_bugly: lastVersion
+      ref: dev
 ```
 
 二、项目配置
