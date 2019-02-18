@@ -121,3 +121,10 @@ UpgradeInfo参数：
 
 3、请勿在targetSdkVersion 26以上设置autoDownloadOnWifi = true，会导致在8.0以上机型更新策略没有反应
 
+
+非常感谢您的支持
+-------
+微信赞赏码
+
+![](https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/image/mm_reward_qrcode.png)
+
