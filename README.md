@@ -108,7 +108,7 @@ UpgradeInfo参数：
 
 1、flutter异常上报不属于崩溃，所以如需查看flutter的异常上报，请在【错误分析】tab页查看
 
-![](https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/screenshot/crash.png)
+![](https://github.com/crazecoder/flutter_bugly/blob/1ff1928b3215a8fa1c8fb99c3071692da322e278/screenshot/crash.png)
 
 
 2、iOS的异常上报没有过多测试，如出现问题请issue
@@ -126,5 +126,5 @@ UpgradeInfo参数：
 -------
 微信赞赏码
 
-![](https://raw.githubusercontent.com/crazecoder/flutter_bugly/master/image/mm_reward_qrcode.png)
+![](https://github.com/crazecoder/flutter_bugly/blob/39a53324ee419ab045ce09c44971ee7b1f35d3c7/image/mm_reward_qrcode.png)
 
