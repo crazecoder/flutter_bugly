@@ -72,7 +72,6 @@ flutter build apk --release --target-platform android-arm
  int initDelay = 0, //延迟初始化，单位秒
  int upgradeCheckPeriod = 0, //升级检查周期设置,单位秒
  
- 
  //手动检查更新
  checkUpgrade({
      bool isManual = false,//用户手动点击检查，非用户点击操作请传false
