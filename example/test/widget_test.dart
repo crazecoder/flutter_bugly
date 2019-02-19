@@ -1,17 +1,18 @@
-//// This is a basic Flutter widget test.
-////
-//// To perform an interaction with a widget in your test, use the WidgetTester
-//// utility that Flutter provides. For example, you can send tap and scroll
-//// gestures. You can also use WidgetTester to find child widgets in the widget
-//// tree, read text, and verify that the values of widget properties are correct.
+// This is a basic Flutter widget test.
 //
-//import 'package:flutter/material.dart';
+// To perform an interaction with a widget in your test, use the WidgetTester
+// utility that Flutter provides. For example, you can send tap and scroll
+// gestures. You can also use WidgetTester to find child widgets in the widget
+// tree, read text, and verify that the values of widget properties are correct.
+
+import 'package:flutter/material.dart';
 //import 'package:flutter_test/flutter_test.dart';
-//
-//import '../lib/main.dart';
-//void main() {
+
+//import 'package:flutter_bugly_example/main.dart';
+
+void main() {
 //  testWidgets('Verify Platform version', (WidgetTester tester) async {
-//    // Build our app and trigger a frame.
+    // Build our app and trigger a frame.
 //    await tester.pumpWidget(MyApp());
 //
 //    // Verify that platform version is retrieved.
@@ -23,4 +24,4 @@
 //      findsOneWidget,
 //    );
 //  });
-//}
+}
