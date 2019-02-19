@@ -7,7 +7,7 @@
 
 ---
 
-一、引入
+一、引入（修正：bugly官方不支持androidx，请使用0.1.4）
 --
 ```yaml
 //因为大部分主流插件都已升级androidx，所以pub库升级androidx
