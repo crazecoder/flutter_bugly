@@ -42,13 +42,6 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
 
     public FlutterBuglyPlugin(Activity activity) {
         this.activity = activity;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!hasPermissions()) {
-                ActivityCompat.requestPermissions(activity,
-                        PERMISSIONS_BUGLY,
-                        0);
-            }
-        }
     }
     private boolean hasPermissions() {
         for (String permission:PERMISSIONS_BUGLY){
