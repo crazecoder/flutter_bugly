@@ -120,6 +120,7 @@ UpgradeInfo参数：
 
 ~~3、请勿在targetSdkVersion 26以上设置autoDownloadOnWifi = true，会导致在8.0以上机型更新策略没有反应~~
 
+4、因为版本更新弹窗封装进sdk，使用的是support包，所以使用androidx包时，请配合FlutterBugly.getUpgradeInfo()方法自定义弹窗界面 [示例](https://github.com/crazecoder/testsocket/blob/master/lib/ui/home.dart)
 
 非常感谢您的支持
 -------
