@@ -5,9 +5,9 @@ import 'package:flutter_bugly/flutter_bugly.dart';
 
 import 'update_dialog.dart';
 
-void main()=>FlutterBugly.postCatchedException((){
-  runApp(MyApp());
-});
+void main() => FlutterBugly.postCatchedException(() {
+      runApp(MyApp());
+    });
 
 class MyApp extends StatefulWidget {
   @override
@@ -56,6 +56,7 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
   void showUpdateDialog(String version, String url) async {
     await showDialog(
       barrierDismissible: false,
@@ -63,16 +64,23 @@ class _MyAppState extends State<MyApp> {
       builder: (_) => _buildDialog(version, url),
     );
   }
+
   Widget _buildDialog(String version, String url) {
     return new UpdateDialog(
-      key:_dialogKey,
-      version:version,
-      onClickWhenDownload:(_msg) {
+      key: _dialogKey,
+      version: version,
+      onClickWhenDownload: (_msg) {
         //提示不要重复下载
       },
-      onClickWhenNotDownload:() {
+      onClickWhenNotDownload: () {
         //下载apk，完成后打开apk文件，建议使用dio+open_file插件
       },
     );
+  }
+  //dio可以监听下载进度，调用此方法
+  void _updateProgress(_progress) {
+    setState(() {
+      _dialogKey.currentState.progress = _progress;
+    });
   }
 }
