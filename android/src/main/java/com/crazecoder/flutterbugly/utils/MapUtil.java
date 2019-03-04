@@ -1,4 +1,4 @@
-package com.crazecoder.flutterbugly;
+package com.crazecoder.flutterbugly.utils;
 
 
 import java.lang.reflect.Field;

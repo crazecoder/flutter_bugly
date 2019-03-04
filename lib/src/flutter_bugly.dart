@@ -5,13 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'bean/upgrade_info.dart';
+import 'bean/init_result_info.dart';
 
 class FlutterBugly {
   FlutterBugly._();
 
-  static const MethodChannel _channel = const MethodChannel('flutter_bugly');
+  static const MethodChannel _channel = const MethodChannel('crazecoder/flutter_bugly');
 
-  static Future<String> init({
+  static Future<InitResultInfo> init({
     String androidAppId,
     String iOSAppId,
     bool autoCheckUpgrade = true,
@@ -37,7 +38,9 @@ class FlutterBugly {
       "upgradeCheckPeriod": upgradeCheckPeriod,
     };
     final String result = await _channel.invokeMethod('initBugly', map);
-    return result;
+    Map resultMap = json.decode(result);
+    var resultBean = InitResultInfo.fromJson(resultMap);
+    return resultBean;
   }
 
   static Future<UpgradeInfo> getUpgradeInfo() async {

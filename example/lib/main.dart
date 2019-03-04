@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
       iOSAppId: "your app id",
     ).then((_result) {
       setState(() {
-        _platformVersion = _result;
+        _platformVersion = _result.message;
       });
     });
   }

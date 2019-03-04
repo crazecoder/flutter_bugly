@@ -1,10 +1,11 @@
 package com.crazecoder.flutterbugly;
 
-import android.Manifest;
 import android.app.Activity;
-import android.os.Build;
 import android.text.TextUtils;
 
+import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
+import com.crazecoder.flutterbugly.utils.JsonUtil;
+import com.crazecoder.flutterbugly.utils.MapUtil;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
@@ -15,9 +16,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -29,50 +27,28 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  */
 public class FlutterBuglyPlugin implements MethodCallHandler {
     private Activity activity;
+    private Result result;
+    private boolean isResultSubmitted = false;
 
-    private static final String[] PERMISSIONS_BUGLY = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.READ_LOGS,
-            Manifest.permission.REQUEST_INSTALL_PACKAGES,
-    };
 
     public FlutterBuglyPlugin(Activity activity) {
         this.activity = activity;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!hasPermissions()) {
-                ActivityCompat.requestPermissions(activity,
-                        PERMISSIONS_BUGLY,
-                        0);
-            }
-        }
-    }
-    private boolean hasPermissions() {
-        for (String permission:PERMISSIONS_BUGLY){
-            if(!hasPermission(permission)){
-                return false;
-            }
-        }
-        return true;
-    }
-    private boolean hasPermission(String permission) {
-        return ContextCompat.checkSelfPermission(activity,permission) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_bugly");
-        channel.setMethodCallHandler(new FlutterBuglyPlugin(registrar.activity()));
+        final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
+        FlutterBuglyPlugin plugin = new FlutterBuglyPlugin(registrar.activity());
+        channel.setMethodCallHandler(plugin);
     }
 
     @Override
     public void onMethodCall(final MethodCall call, final Result result) {
+        isResultSubmitted = false;
         if (call.method.equals("initBugly")) {
+            this.result = result;
             if (call.hasArgument("appId")) {
                 if (call.hasArgument("enableHotfix")) {
                     Beta.enableHotfix = call.argument("enableHotfix");
@@ -102,10 +78,9 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 }
                 Beta.canShowUpgradeActs.add(activity.getClass());
                 Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
-                result.success("Bugly 初始化成功");
-
+                result(getResultBean(true, "Bugly 初始化成功"));
             } else {
-                result.success("Bugly key不能为空");
+                result(getResultBean(false, "Bugly key不能为空"));
             }
         } else if (call.method.equals("checkUpgrade")) {
             boolean isManual = false;
@@ -165,11 +140,25 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             Throwable throwable = new Throwable(message);
             throwable.setStackTrace(elements.toArray(elementsArray));
             CrashReport.postCatchedException(throwable);
-            result.success(null);
+            result(null);
         } else {
             result.notImplemented();
+            isResultSubmitted = true;
         }
 
     }
 
+    private void result(BuglyInitResultInfo bean) {
+        if (result != null && !isResultSubmitted) {
+            result.success(JsonUtil.toJson(MapUtil.deepToMap(bean)));
+            isResultSubmitted = true;
+        }
+    }
+
+    private BuglyInitResultInfo getResultBean(boolean isSuccess, String msg) {
+        BuglyInitResultInfo bean = new BuglyInitResultInfo();
+        bean.setSuccess(isSuccess);
+        bean.setMessage(msg);
+        return bean;
+    }
 }
