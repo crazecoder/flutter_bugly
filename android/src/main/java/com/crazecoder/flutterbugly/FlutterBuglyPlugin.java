@@ -150,7 +150,11 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
 
     private void result(BuglyInitResultInfo bean) {
         if (result != null && !isResultSubmitted) {
-            result.success(JsonUtil.toJson(MapUtil.deepToMap(bean)));
+            if(bean==null){
+                result.success(null);
+            }else {
+                result.success(JsonUtil.toJson(MapUtil.deepToMap(bean)));
+            }
             isResultSubmitted = true;
         }
     }
