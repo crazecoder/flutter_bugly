@@ -96,6 +96,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         } else if (call.method.equals("upgradeListener")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
             result(JsonUtil.toJson(MapUtil.deepToMap(strategy)));
+            isResultSubmitted = true;
         } else if (call.method.equals("postCatchedException")) {
             String message = "";
             String detail = null;
@@ -140,7 +141,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 }
             }
             Throwable throwable = new Throwable(message);
-            if (elements.size() > 0){
+            if (elements.size() > 0) {
                 StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
                 throwable.setStackTrace(elements.toArray(elementsArray));
             }
@@ -153,12 +154,14 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
 
     }
 
-    private void result(BuglyInitResultInfo bean) {
+    private void result(Object object) {
         if (result != null && !isResultSubmitted) {
-            if (bean == null) {
+            if (object == null) {
                 result.success(null);
+            } else if (object instanceof BuglyInitResultInfo) {
+                result.success(JsonUtil.toJson(MapUtil.deepToMap(object)));
             } else {
-                result.success(JsonUtil.toJson(MapUtil.deepToMap(bean)));
+                result.success(object.toString());
             }
             isResultSubmitted = true;
         }
