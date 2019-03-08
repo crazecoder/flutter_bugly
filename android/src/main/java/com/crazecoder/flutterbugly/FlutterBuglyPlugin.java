@@ -47,8 +47,8 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
     @Override
     public void onMethodCall(final MethodCall call, final Result result) {
         isResultSubmitted = false;
+        this.result = result;
         if (call.method.equals("initBugly")) {
-            this.result = result;
             if (call.hasArgument("appId")) {
                 if (call.hasArgument("enableHotfix")) {
                     Beta.enableHotfix = call.argument("enableHotfix");
@@ -95,8 +95,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             result(null);
         } else if (call.method.equals("upgradeListener")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
-            result(JsonUtil.toJson(MapUtil.deepToMap(strategy)));
-            isResultSubmitted = true;
+            result(strategy);
         } else if (call.method.equals("postCatchedException")) {
             String message = "";
             String detail = null;
@@ -158,10 +157,8 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         if (result != null && !isResultSubmitted) {
             if (object == null) {
                 result.success(null);
-            } else if (object instanceof BuglyInitResultInfo) {
-                result.success(JsonUtil.toJson(MapUtil.deepToMap(object)));
             } else {
-                result.success(object.toString());
+                result.success(JsonUtil.toJson(MapUtil.deepToMap(object)));
             }
             isResultSubmitted = true;
         }
