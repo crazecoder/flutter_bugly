@@ -116,6 +116,9 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                     String[] contents = s.split(" \\(");
                     if (contents.length > 0) {
                         methodName = contents[0];
+                        if (contents.length < 2) {
+                            break;
+                        }
                         String packageContent = contents[1].replace(")", "");
                         String[] packageContentArray = packageContent.split("\\.dart:");
                         if (packageContentArray.length > 0) {
@@ -136,9 +139,11 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                     elements.add(element);
                 }
             }
-            StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
             Throwable throwable = new Throwable(message);
-            throwable.setStackTrace(elements.toArray(elementsArray));
+            if (elements.size() > 0){
+                StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
+                throwable.setStackTrace(elements.toArray(elementsArray));
+            }
             CrashReport.postCatchedException(throwable);
             result(null);
         } else {
@@ -150,9 +155,9 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
 
     private void result(BuglyInitResultInfo bean) {
         if (result != null && !isResultSubmitted) {
-            if(bean==null){
+            if (bean == null) {
                 result.success(null);
-            }else {
+            } else {
                 result.success(JsonUtil.toJson(MapUtil.deepToMap(bean)));
             }
             isResultSubmitted = true;
