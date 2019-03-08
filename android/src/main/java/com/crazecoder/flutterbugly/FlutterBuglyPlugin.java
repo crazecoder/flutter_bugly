@@ -92,10 +92,10 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 isSilence = call.argument("isSilence");
             }
             Beta.checkUpgrade(isManual, isSilence);
-            result.success(null);
+            result(null);
         } else if (call.method.equals("upgradeListener")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
-            result.success(JsonUtil.toJson(MapUtil.deepToMap(strategy)));
+            result(JsonUtil.toJson(MapUtil.deepToMap(strategy)));
         } else if (call.method.equals("postCatchedException")) {
             String message = "";
             String detail = null;
