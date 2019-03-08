@@ -1,6 +1,8 @@
+## 0.1.7
+* 优化格式化异常信息上报时的逻辑
 ## 0.1.6+2
 * 修改iOS为返回InitResultInfo实体
-## 0.1.6+1
+## 0.****1.6+1
 * 删除.idea及优化逻辑严谨性
 ## 0.1.6
 * sdk自带6.0以上动态权限，删除插件中的权限动态申请
@@ -11,3 +13,4 @@
 * fix crash when FileProvider not find 
 ## 0.1.4+1
 * migrate to androidx
+
