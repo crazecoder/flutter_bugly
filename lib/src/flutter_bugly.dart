@@ -10,7 +10,8 @@ import 'bean/init_result_info.dart';
 class FlutterBugly {
   FlutterBugly._();
 
-  static const MethodChannel _channel = const MethodChannel('crazecoder/flutter_bugly');
+  static const MethodChannel _channel =
+      const MethodChannel('crazecoder/flutter_bugly');
 
   static Future<InitResultInfo> init({
     String androidAppId,
@@ -18,7 +19,7 @@ class FlutterBugly {
     bool autoCheckUpgrade = true,
     bool autoDownloadOnWifi = false,
     bool enableHotfix = false,
-    bool enableNotification = false, //官方没有适配8.0，配合targetSdkVersion使用
+    bool enableNotification = false, //未适配androidx
     bool showInterruptedStrategy = true, //设置开启显示打断策略
     bool canShowApkInfo = true, //设置是否显示弹窗中的apk信息
     int initDelay = 0, //延迟初始化,单位秒
@@ -61,8 +62,12 @@ class FlutterBugly {
     await _channel.invokeMethod('checkUpgrade', map);
   }
 
-  static void postCatchedException<T>(T callback(),
-      {bool useLog = false, FlutterExceptionHandler handler}) {
+  static void postCatchedException<T>(
+    T callback(), {
+    bool useLog = false, //是否打印，默认不打印异常
+    FlutterExceptionHandler handler, //异常捕捉，用于自定义打印异常
+    String filterRegExp, //异常上报过滤正则，针对message
+  }) {
     var map = {};
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (FlutterErrorDetails details) async {
@@ -90,7 +95,16 @@ class FlutterBugly {
     runZoned<Future<Null>>(() async {
       callback();
     }, onError: (error, stackTrace) async {
-      map.putIfAbsent("crash_message", () => error.toString());
+      var errorStr = error.toString();
+      //异常过滤
+      if (filterRegExp != null) {
+        RegExp reg = new RegExp(filterRegExp);
+        Iterable<Match> matches = reg.allMatches(errorStr);
+        if (matches.length > 0) {
+          return;
+        }
+      }
+      map.putIfAbsent("crash_message", () => errorStr);
       map.putIfAbsent("crash_detail", () => stackTrace.toString());
       await _channel.invokeMethod('postCatchedException', map);
     });
