@@ -124,7 +124,5 @@ UpgradeInfo参数：
 
 非常感谢您的支持
 -------
-微信赞赏码
-
-![](https://github.com/crazecoder/flutter_bugly/blob/39a53324ee419ab045ce09c44971ee7b1f35d3c7/image/mm_reward_qrcode.png)
+[微信赞赏码](https://github.com/crazecoder/flutter_bugly/blob/39a53324ee419ab045ce09c44971ee7b1f35d3c7/image/mm_reward_qrcode.png)
 
