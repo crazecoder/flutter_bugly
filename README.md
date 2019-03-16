@@ -31,7 +31,7 @@ dependencies:
     defaultConfig {
         ndk {
             //设置支持的SO库架构
-            abiFilters 'arm64-v8a', 'x86'//, 'armeabi-v7a', 'x86_64'
+            abiFilters 'armeabi-v7a'//, 'arm64-v8a', 'x86', 'x86_64'
         }
     }
 ```
@@ -56,7 +56,7 @@ FlutterBugly.init(androidAppId: "your android app id",iOSAppId: "your iOS app id
 ```
 flutter build apk --release --target-platform android-arm64
 ```
-32-bit
+32-bit（目前配合armeabi-v7a可以打出32位64位通用包）
 ```
 flutter build apk --release --target-platform android-arm
 ```
