@@ -46,6 +46,7 @@ class FlutterBugly {
 
   static Future<UpgradeInfo> getUpgradeInfo() async {
     final String result = await _channel.invokeMethod('upgradeListener');
+    if (result == null || result.isEmpty) return null;
     Map map = json.decode(result);
     var info = UpgradeInfo.fromJson(map);
     return info;
@@ -64,8 +65,8 @@ class FlutterBugly {
 
   static void postCatchedException<T>(
     T callback(), {
-    bool useLog = false,//是否打印，默认不打印异常
-    FlutterExceptionHandler handler,//异常捕捉，用于自定义打印异常
+    bool useLog = false, //是否打印，默认不打印异常
+    FlutterExceptionHandler handler, //异常捕捉，用于自定义打印异常
     String filterRegExp, //异常上报过滤正则，针对message
   }) {
     var map = {};
@@ -100,7 +101,7 @@ class FlutterBugly {
       if (filterRegExp != null) {
         RegExp reg = new RegExp(filterRegExp);
         Iterable<Match> matches = reg.allMatches(errorStr);
-        if(matches.length>0){
+        if (matches.length > 0) {
           return;
         }
       }
