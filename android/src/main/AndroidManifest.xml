@@ -1,7 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.crazecoder.flutterbugly">
 
-    <application>
+    <application android:networkSecurityConfig="@xml/network_security_config"
+        tools:targetApi="n">
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
@@ -12,4 +15,5 @@
                 android:resource="@xml/provider_paths" />
         </provider>
     </application>
+
 </manifest>
