@@ -46,6 +46,7 @@ class FlutterBugly {
 
   static Future<UpgradeInfo> getUpgradeInfo() async {
     final String result = await _channel.invokeMethod('upgradeListener');
+    if (result == null || result.isEmpty) return null;
     Map map = json.decode(result);
     var info = UpgradeInfo.fromJson(map);
     return info;
