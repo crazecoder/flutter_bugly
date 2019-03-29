@@ -1,3 +1,9 @@
+## 0.1.9+2
+* 解决The 'Pods-Runner' target has transitive dependencies that include static binaries
+## 0.1.9+1
+* 获取更新信息增加非空判断
+## 0.1.9
+* 解决Android 9.0上联网失败的问题
 ## 0.1.8
 * 增加异常上报过滤
 ## 0.1.7
