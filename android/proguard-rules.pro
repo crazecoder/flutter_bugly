@@ -49,6 +49,10 @@
 -keep public class * extends android.preference.Preference
 -keep public class * extends android.support.**
 -keep public class com.android.vending.licensing.ILicensingService
+
+#这句非常重要，主要是滤掉 bean包下的所有.class文件不进行混淆编译
+-keep class com.crazecoder.flutterbugly.bean.** { *; }
+
 -keepclasseswithmembernames class * {
     native <methods>;
 }
