@@ -65,6 +65,7 @@ flutter build apk --release --target-platform android-arm
 -----
 ```dart
  bool autoCheckUpgrade = true,//自动检查更新开关
+ bool autoInit = true,//自动初始化
  bool autoDownloadOnWifi = false,//设置Wifi下自动下载
  bool enableNotification = false,//通知栏
  bool showInterruptedStrategy = true, //设置开启显示打断策略
