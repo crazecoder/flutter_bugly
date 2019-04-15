@@ -9,6 +9,7 @@ import com.crazecoder.flutterbugly.utils.MapUtil;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
+import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
     private Activity activity;
     private Result result;
     private boolean isResultSubmitted = false;
+    private UpgradeInfo upgradeInfo;
 
 
     public FlutterBuglyPlugin(Activity activity) {
@@ -50,6 +52,9 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         this.result = result;
         if (call.method.equals("initBugly")) {
             if (call.hasArgument("appId")) {
+                if (call.hasArgument("autoInit")) {
+                    Beta.autoInit = false;
+                }
                 if (call.hasArgument("enableHotfix")) {
                     Beta.enableHotfix = call.argument("enableHotfix");
                 }
@@ -77,6 +82,15 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                     Beta.canShowApkInfo = call.argument("canShowApkInfo");
                 }
                 Beta.canShowUpgradeActs.add(activity.getClass());
+                /*在application中初始化时设置监听，监听策略的收取*/
+                Beta.upgradeListener = new UpgradeListener() {
+                    @Override
+                    public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
+                        if (strategy != null) {
+                            upgradeInfo = strategy;
+                        }
+                    }
+                };
                 Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
                 result(getResultBean(true, "Bugly 初始化成功"));
             } else {
@@ -94,8 +108,8 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             Beta.checkUpgrade(isManual, isSilence);
             result(null);
         } else if (call.method.equals("upgradeListener")) {
-            UpgradeInfo strategy = Beta.getUpgradeInfo();
-            result(strategy);
+//            UpgradeInfo strategy = Beta.getUpgradeInfo();
+            result(upgradeInfo);
         } else if (call.method.equals("postCatchedException")) {
             String message = "";
             String detail = null;
