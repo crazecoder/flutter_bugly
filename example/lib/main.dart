@@ -9,12 +9,19 @@ void main() => FlutterBugly.postCatchedException(() {
       runApp(MyApp());
     });
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: HomePage(),
+    );
+  }
 }
-
-class _MyAppState extends State<MyApp> {
+class HomePage extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() =>_HomePageState();
+}
+class _HomePageState extends State<HomePage>{
   String _platformVersion = 'Unknown';
   GlobalKey<UpdateDialogState> _dialogKey = new GlobalKey();
 
@@ -22,7 +29,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     FlutterBugly.init(
-      androidAppId: "your app id",
+      androidAppId: "your android id",//测试 5346b6e5bb
       iOSAppId: "your app id",
     ).then((_result) {
       setState(() {
@@ -30,53 +37,53 @@ class _MyAppState extends State<MyApp> {
       });
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: GestureDetector(
-          onTap: () {
-            if (Platform.isAndroid) {
-              FlutterBugly.checkUpgrade();
-              FlutterBugly.getUpgradeInfo().then((UpgradeInfo info) {
-                if (info != null && info.id != null) {
-                  showUpdateDialog(info.newFeature, info.apkUrl);
-                }
-              });
-            }
-          },
-          child: Center(
-            child: Text('init result: $_platformVersion\n'),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plugin example app'),
+      ),
+      body: GestureDetector(
+        onTap: () {
+          if (Platform.isAndroid) {
+            FlutterBugly.getUpgradeInfo().then((UpgradeInfo info) {
+              print("----------------${info.apkUrl}");
+              if (info != null && info.id != null) {
+                showUpdateDialog(
+                    info.newFeature, info.apkUrl, info.upgradeType == 2);
+              }
+            });
+          }
+        },
+        child: Center(
+          child: Text('init result: $_platformVersion\n'),
         ),
       ),
     );
   }
-
-  void showUpdateDialog(String version, String url) async {
-    await showDialog(
+  void showUpdateDialog(String version, String url, bool isForceUpgrade) {
+    showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (_) => _buildDialog(version, url),
+      builder: (_) => _buildDialog(version, url, isForceUpgrade),
     );
   }
 
-  Widget _buildDialog(String version, String url) {
-    return new UpdateDialog(
-      key: _dialogKey,
-      version: version,
-      onClickWhenDownload: (_msg) {
-        //提示不要重复下载
-      },
-      onClickWhenNotDownload: () {
-        //下载apk，完成后打开apk文件，建议使用dio+open_file插件
-      },
-    );
+  Widget _buildDialog(String version, String url, bool isForceUpgrade) {
+    return WillPopScope(
+        onWillPop: () async => isForceUpgrade,
+        child: UpdateDialog(
+          key: _dialogKey,
+          version: version,
+          onClickWhenDownload: (_msg) {
+            //提示不要重复下载
+          },
+          onClickWhenNotDownload: () {
+            //下载apk，完成后打开apk文件，建议使用dio+open_file插件
+          },
+        ));
   }
+
   //dio可以监听下载进度，调用此方法
   void _updateProgress(_progress) {
     setState(() {

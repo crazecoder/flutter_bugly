@@ -4,7 +4,7 @@ class UpgradeInfo {
   String newFeature = "";
   int publishTime = 0;
   int publishType = 0;
-  int upgradeType = 1;
+  int upgradeType = 1;//2为强制更新
   int popTimes = 0;
   int popInterval = 0;
   int versionCode;
