@@ -1,3 +1,5 @@
+## 0.2.0
+* 优化UpgradeInfo获取机制
 ## 0.1.9+2
 * 解决The 'Pods-Runner' target has transitive dependencies that include static binaries
 ## 0.1.9+1
