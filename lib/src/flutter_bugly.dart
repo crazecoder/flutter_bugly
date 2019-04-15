@@ -17,6 +17,7 @@ class FlutterBugly {
     String androidAppId,
     String iOSAppId,
     bool autoCheckUpgrade = true,
+    bool autoInit = true,
     bool autoDownloadOnWifi = false,
     bool enableHotfix = false,
     bool enableNotification = false, //未适配androidx
