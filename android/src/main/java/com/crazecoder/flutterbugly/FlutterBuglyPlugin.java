@@ -85,7 +85,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 /*在application中初始化时设置监听，监听策略的收取*/
                 Beta.upgradeListener = new UpgradeListener() {
                     @Override
-                    public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
+                    public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
                         if (strategy != null) {
                             upgradeInfo = strategy;
                         }
@@ -108,7 +108,10 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             Beta.checkUpgrade(isManual, isSilence);
             result(null);
         } else if (call.method.equals("upgradeListener")) {
-//            UpgradeInfo strategy = Beta.getUpgradeInfo();
+            UpgradeInfo strategy = Beta.getUpgradeInfo();
+            if (upgradeInfo == null) {
+                upgradeInfo = strategy;
+            }
             result(upgradeInfo);
         } else if (call.method.equals("postCatchedException")) {
             String message = "";
