@@ -31,14 +31,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     FlutterBugly.init(
-      androidAppId: "your android id", //测试 5346b6e5bb
+      androidAppId: "your android id",
       iOSAppId: "your app id",
-      userId: 'user ID',
     ).then((_result) {
       setState(() {
         _platformVersion = _result.message;
       });
     });
+    FlutterBugly.setUserId("user id");
   }
 
   @override
