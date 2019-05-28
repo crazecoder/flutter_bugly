@@ -17,6 +17,12 @@
       if(!b){
           [Bugly startWithAppId:appId];
           NSLog(@"Bugly appId: %@", appId);
+
+          NSString *userId = call.arguments[@"userId"];
+          if (![self isBlankString:userId]) {
+              [Bugly setUserIdentifier:userId];
+          }
+
           NSDictionary * dict = @{@"message":@"Bugly 初始化成功", @"isSuccess":@YES};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
           NSString * json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];

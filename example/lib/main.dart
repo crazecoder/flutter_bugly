@@ -17,11 +17,13 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-class HomePage extends StatefulWidget{
+
+class HomePage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() =>_HomePageState();
+  State<StatefulWidget> createState() => _HomePageState();
 }
-class _HomePageState extends State<HomePage>{
+
+class _HomePageState extends State<HomePage> {
   String _platformVersion = 'Unknown';
   GlobalKey<UpdateDialogState> _dialogKey = new GlobalKey();
 
@@ -29,14 +31,16 @@ class _HomePageState extends State<HomePage>{
   void initState() {
     super.initState();
     FlutterBugly.init(
-      androidAppId: "your android id",//测试 5346b6e5bb
+      androidAppId: "your android id", //测试 5346b6e5bb
       iOSAppId: "your app id",
+      userId: 'user ID',
     ).then((_result) {
       setState(() {
         _platformVersion = _result.message;
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +65,7 @@ class _HomePageState extends State<HomePage>{
       ),
     );
   }
+
   void showUpdateDialog(String version, String url, bool isForceUpgrade) {
     showDialog(
       barrierDismissible: false,
