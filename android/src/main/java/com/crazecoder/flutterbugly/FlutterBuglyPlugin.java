@@ -96,6 +96,11 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             } else {
                 result(getResultBean(false, "Bugly key不能为空"));
             }
+        } else if (call.method.equals("setUserId")) {
+            if (call.hasArgument("userId")) {
+                String userId = call.argument("userId");
+                CrashReport.setUserId(userId);
+            }
         } else if (call.method.equals("checkUpgrade")) {
             boolean isManual = false;
             boolean isSilence = false;

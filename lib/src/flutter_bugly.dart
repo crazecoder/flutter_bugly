@@ -16,7 +16,6 @@ class FlutterBugly {
   static Future<InitResultInfo> init({
     String androidAppId,
     String iOSAppId,
-    String userId,
     bool autoCheckUpgrade = true,
     bool autoInit = true,
     bool autoDownloadOnWifi = false,
@@ -31,7 +30,6 @@ class FlutterBugly {
         (Platform.isIOS && iOSAppId != null));
     Map<String, Object> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
-      "userId": userId,
       "autoCheckUpgrade": autoCheckUpgrade,
       "autoDownloadOnWifi": autoDownloadOnWifi,
       "enableHotfix": enableHotfix,
@@ -45,6 +43,13 @@ class FlutterBugly {
     Map resultMap = json.decode(result);
     var resultBean = InitResultInfo.fromJson(resultMap);
     return resultBean;
+  }
+
+  static Future<Null> setUserId(String userId) async {
+    Map<String, Object> map = {
+      "userId": userId,
+    };
+    await _channel.invokeMethod('setUserId', map);
   }
 
   static Future<UpgradeInfo> getUpgradeInfo() async {
