@@ -50,6 +50,7 @@
       if (![self isBlankString:userId]) {
           [Bugly setUserIdentifier:userId];
       }
+      result(nil);
   }else {
       result(FlutterMethodNotImplemented);
   }
