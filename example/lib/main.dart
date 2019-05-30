@@ -39,6 +39,9 @@ class _HomePageState extends State<HomePage> {
       });
     });
     FlutterBugly.setUserId("user id");
+    FlutterBugly.putUserData(key: "key", value: "value");
+    int tag = 9527;
+    FlutterBugly.setUserTag(tag);
   }
 
   @override

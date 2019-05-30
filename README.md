@@ -64,6 +64,7 @@ flutter build apk --release --target-platform android-arm
 五、支持属性（Android）
 -----
 ```dart
+ String channel, //自定义渠道标识
  bool autoCheckUpgrade = true,//自动检查更新开关
  bool autoInit = true,//自动初始化
  bool autoDownloadOnWifi = false,//设置Wifi下自动下载
@@ -78,6 +79,10 @@ flutter build apk --release --target-platform android-arm
      bool isManual = false,//用户手动点击检查，非用户点击操作请传false
      bool isSilence = false,//是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
  })
+ FlutterBugly.setUserId("user id");
+ FlutterBugly.putUserData(key: "key", value: "value");
+ int tag = 9527;
+ FlutterBugly.setUserTag(tag);
 ```
 六、自定义弹窗（Android）
 ------
