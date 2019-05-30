@@ -92,6 +92,11 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                     }
                 };
                 Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
+                if (call.hasArgument("channel")) {
+                    String channel = call.argument("channel");
+                    if (!TextUtils.isEmpty(channel))
+                        Bugly.setAppChannel(activity.getApplicationContext(), channel);
+                }
                 result(getResultBean(true, "Bugly 初始化成功"));
             } else {
                 result(getResultBean(false, "Bugly key不能为空"));
@@ -99,8 +104,23 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         } else if (call.method.equals("setUserId")) {
             if (call.hasArgument("userId")) {
                 String userId = call.argument("userId");
-                CrashReport.setUserId(userId);
+                Bugly.setUserId(activity.getApplicationContext(), userId);
             }
+            result(null);
+        } else if (call.method.equals("setUserTag")) {
+            if (call.hasArgument("userTag")) {
+                Integer userTag = call.argument("userTag");
+                if (userTag != null)
+                    Bugly.setUserTag(activity.getApplicationContext(), userTag);
+            }
+            result(null);
+        } else if (call.method.equals("putUserData")) {
+            if (call.hasArgument("key") && call.hasArgument("value")) {
+                String userDataKey = call.argument("key");
+                String userDataValue = call.argument("value");
+                Bugly.putUserData(activity.getApplicationContext(), userDataKey, userDataValue);
+            }
+            result(null);
         } else if (call.method.equals("checkUpgrade")) {
             boolean isManual = false;
             boolean isSilence = false;

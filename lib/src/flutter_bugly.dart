@@ -16,6 +16,7 @@ class FlutterBugly {
   static Future<InitResultInfo> init({
     String androidAppId,
     String iOSAppId,
+    String channel, //自定义渠道标识
     bool autoCheckUpgrade = true,
     bool autoInit = true,
     bool autoDownloadOnWifi = false,
@@ -30,6 +31,7 @@ class FlutterBugly {
         (Platform.isIOS && iOSAppId != null));
     Map<String, Object> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
+      "channel": channel,
       "autoCheckUpgrade": autoCheckUpgrade,
       "autoDownloadOnWifi": autoDownloadOnWifi,
       "enableHotfix": enableHotfix,
@@ -45,11 +47,33 @@ class FlutterBugly {
     return resultBean;
   }
 
+  ///设置用户标识
   static Future<Null> setUserId(String userId) async {
     Map<String, Object> map = {
       "userId": userId,
     };
     await _channel.invokeMethod('setUserId', map);
+  }
+
+  ///设置标签
+  ///userTag 标签ID，可在网站生成
+  static Future<Null> setUserTag(int userTag) async {
+    Map<String, Object> map = {
+      "userTag": userTag,
+    };
+    await _channel.invokeMethod('setUserTag', map);
+  }
+
+  ///设置关键数据，随崩溃信息上报
+  static Future<Null> putUserData(
+      {@required String key, @required String value}) async {
+    assert(key != null && key.isNotEmpty);
+    assert(value != null && value.isNotEmpty);
+    Map<String, Object> map = {
+      "key": key,
+      "value": value,
+    };
+    await _channel.invokeMethod('putUserData', map);
   }
 
   static Future<UpgradeInfo> getUpgradeInfo() async {
@@ -64,6 +88,7 @@ class FlutterBugly {
     bool isManual = false,
     bool isSilence = false,
   }) async {
+    if (!Platform.isAndroid) return;
     Map<String, Object> map = {
       "isManual": isManual, //用户手动点击检查，非用户点击操作请传false
       "isSilence": isSilence, //是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]

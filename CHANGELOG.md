@@ -1,4 +1,7 @@
-## 0.2.1
+## 0.2.2
+* 新增初始化channel参数，见注释
+* 新增setUserTag、putUserData方法，见注释
+## 0.2.1+1
 * 新增setUserId方法，用于crash用户标识
 ## 0.2.0+1
 * 优化UpgradeInfo获取机制，优先获取网络策略，网络策略没有来得及拉取时，取本地策略
