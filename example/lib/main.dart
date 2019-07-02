@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> {
     FlutterBugly.putUserData(key: "key", value: "value");
     int tag = 9527;
     FlutterBugly.setUserTag(tag);
+    if (mounted) _checkUpgrade();
   }
 
   @override
@@ -53,13 +54,7 @@ class _HomePageState extends State<HomePage> {
       body: GestureDetector(
         onTap: () {
           if (Platform.isAndroid) {
-            FlutterBugly.getUpgradeInfo().then((UpgradeInfo info) {
-              print("----------------${info.apkUrl}");
-              if (info != null && info.id != null) {
-                showUpdateDialog(
-                    info.newFeature, info.apkUrl, info.upgradeType == 2);
-              }
-            });
+            _checkUpgrade();
           }
         },
         child: Center(
@@ -69,12 +64,22 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void showUpdateDialog(String version, String url, bool isForceUpgrade) {
+  void _showUpdateDialog(String version, String url, bool isForceUpgrade) {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (_) => _buildDialog(version, url, isForceUpgrade),
     );
+  }
+
+  void _checkUpgrade() {
+    print("获取更新中。。。");
+    FlutterBugly.checkUpgrade().then((UpgradeInfo info) {
+      if (info != null && info.id != null) {
+        print("----------------${info.apkUrl}");
+        _showUpdateDialog(info.newFeature, info.apkUrl, info.upgradeType == 2);
+      }
+    });
   }
 
   Widget _buildDialog(String version, String url, bool isForceUpgrade) {
