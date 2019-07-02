@@ -1,5 +1,6 @@
-# flutter_bugly [![pub package](https://img.shields.io/pub/v/flutter_bugly.svg)](https://pub.dartlang.org/packages/flutter_bugly)
-
+# flutter_bugly 
+[![pub package](https://img.shields.io/pub/v/flutter_bugly.svg)](https://pub.dartlang.org/packages/flutter_bugly)
+[![Gitter](https://badges.gitter.im/flutter_developer/community.svg)](https://gitter.im/flutter_developer/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 腾讯Bugly flutter应用更新插件
 
@@ -129,4 +130,3 @@ UpgradeInfo参数：
 
 4、因为版本更新弹窗封装进sdk，使用的是support包，所以使用androidx包时，请配合FlutterBugly.getUpgradeInfo()或者FlutterBugly.checkUpgrade()【两种方法区别见方法注释】方法自定义弹窗界面 [弹窗示例](https://github.com/crazecoder/flutter_bugly/commit/6052890cee63ec1e433501e1149852878fd234de)或者[有下载打开安装的完整示例](https://github.com/crazecoder/testsocket/blob/master/lib/ui/home.dart)
 
-问题交流：#flutter-china:matrix.org
