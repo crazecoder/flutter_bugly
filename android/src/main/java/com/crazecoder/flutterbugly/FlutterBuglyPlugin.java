@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.text.TextUtils;
 
 import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
+import com.crazecoder.flutterbugly.callback.UpgradeCallback;
 import com.crazecoder.flutterbugly.utils.JsonUtil;
 import com.crazecoder.flutterbugly.utils.MapUtil;
 import com.tencent.bugly.Bugly;
@@ -31,6 +32,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
     private Result result;
     private boolean isResultSubmitted = false;
     private UpgradeInfo upgradeInfo;
+    private static UpgradeCallback callback;
 
 
     public FlutterBuglyPlugin(Activity activity) {
@@ -86,8 +88,8 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 Beta.upgradeListener = new UpgradeListener() {
                     @Override
                     public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                        if (strategy != null) {
-                            upgradeInfo = strategy;
+                        if (callback != null) {
+                            callback.onUpgrade(strategy);
                         }
                     }
                 };
@@ -124,20 +126,34 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         } else if (call.method.equals("checkUpgrade")) {
             boolean isManual = false;
             boolean isSilence = false;
+            boolean useCache = true;
             if (call.hasArgument("isManual")) {
                 isManual = call.argument("isManual");
             }
             if (call.hasArgument("isSilence")) {
                 isSilence = call.argument("isSilence");
             }
-            Beta.checkUpgrade(isManual, isSilence);
-            result(null);
-        } else if (call.method.equals("upgradeListener")) {
-            UpgradeInfo strategy = Beta.getUpgradeInfo();
-            if (upgradeInfo == null) {
-                upgradeInfo = strategy;
+            if (call.hasArgument("useCache")) {
+                useCache = call.argument("cache");
             }
-            result(upgradeInfo);
+            final boolean finalUseCache = useCache;
+            callback = new UpgradeCallback() {
+                @Override
+                public void onUpgrade(UpgradeInfo strategy) {
+                    if(finalUseCache){
+                        if (strategy != null) {
+                            upgradeInfo = strategy;
+                        }
+                        result(upgradeInfo);
+                    }else {
+                        result(strategy);
+                    }
+                }
+            };
+            Beta.checkUpgrade(isManual, isSilence);
+        } else if (call.method.equals("getUpgradeInfo")) {
+            UpgradeInfo strategy = Beta.getUpgradeInfo();
+            result(strategy);
         } else if (call.method.equals("postCatchedException")) {
             String message = "";
             String detail = null;

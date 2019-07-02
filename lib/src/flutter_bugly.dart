@@ -13,6 +13,7 @@ class FlutterBugly {
   static const MethodChannel _channel =
       const MethodChannel('crazecoder/flutter_bugly');
 
+  ///初始化
   static Future<InitResultInfo> init({
     String androidAppId,
     String iOSAppId,
@@ -76,26 +77,32 @@ class FlutterBugly {
     await _channel.invokeMethod('putUserData', map);
   }
 
+  ///获取本地更新策略，即上次未更新的策略
   static Future<UpgradeInfo> getUpgradeInfo() async {
-    final String result = await _channel.invokeMethod('upgradeListener');
-    if (result == null || result.isEmpty) return null;
-    Map map = json.decode(result);
-    var info = UpgradeInfo.fromJson(map);
+    final String result = await _channel.invokeMethod('getUpgradeInfo');
+    var info = _decodeUpgradeInfo(result);
     return info;
   }
 
-  static Future<Null> checkUpgrade({
+  ///检查更新
+  ///return 更新策略信息
+  static Future<UpgradeInfo> checkUpgrade({
     bool isManual = false,
     bool isSilence = false,
+    bool useCache = true,
   }) async {
-    if (!Platform.isAndroid) return;
+    if (!Platform.isAndroid) return null;
     Map<String, Object> map = {
       "isManual": isManual, //用户手动点击检查，非用户点击操作请传false
       "isSilence": isSilence, //是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
+      "useCache": useCache, //是否使用第一次缓存的更新策略，false为实时的，但是bugly会可能返回null
     };
-    await _channel.invokeMethod('checkUpgrade', map);
+    final String result = await _channel.invokeMethod('checkUpgrade', map);
+    var info = _decodeUpgradeInfo(result);
+    return info;
   }
 
+  ///异常上报
   static void postCatchedException<T>(
     T callback(), {
     bool useLog = false, //是否打印，默认不打印异常
@@ -143,4 +150,12 @@ class FlutterBugly {
       await _channel.invokeMethod('postCatchedException', map);
     });
   }
+
+  static UpgradeInfo _decodeUpgradeInfo(String jsonStr) {
+    if (jsonStr == null || jsonStr.isEmpty) return null;
+    Map resultMap = json.decode(jsonStr);
+    var info = UpgradeInfo.fromJson(resultMap);
+    return info;
+  }
+
 }

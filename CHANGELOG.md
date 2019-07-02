@@ -1,3 +1,6 @@
+## 0.2.3
+* 优化checkUpgrade方法，等待网络请求更新策略完成后再返回UpgradeInfo（注意点见方法注释）
+* 升级com.tencent.bugly:crashreport_upgrade:1.4.1
 ## 0.2.2
 * 新增初始化channel参数，见注释
 * 新增setUserTag、putUserData方法，见注释
