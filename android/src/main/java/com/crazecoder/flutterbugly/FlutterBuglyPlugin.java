@@ -134,7 +134,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                 isSilence = call.argument("isSilence");
             }
             if (call.hasArgument("useCache")) {
-                useCache = call.argument("cache");
+                useCache = call.argument("useCache");
             }
             final boolean finalUseCache = useCache;
             callback = new UpgradeCallback() {
