@@ -1,3 +1,5 @@
+## 0.2.3+1
+* 修复useCache取值不正确的问题
 ## 0.2.3
 * 优化checkUpgrade方法，等待网络请求更新策略完成后再返回UpgradeInfo（注意点见方法注释）
 * 升级com.tencent.bugly:crashreport_upgrade:1.4.1
