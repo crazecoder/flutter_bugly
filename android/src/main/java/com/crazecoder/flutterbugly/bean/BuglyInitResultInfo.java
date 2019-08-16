@@ -8,6 +8,9 @@ package com.crazecoder.flutterbugly.bean;
  */
 public class BuglyInitResultInfo {
     private String message;
+
+    private String appId;
+
     private boolean isSuccess;
 
     public String getMessage() {
@@ -16,6 +19,14 @@ public class BuglyInitResultInfo {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public boolean isSuccess() {

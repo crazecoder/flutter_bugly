@@ -1,3 +1,6 @@
+## 0.2.4
+* 自动适配debug、release模式。debug下只打印异常不上报，release只上报，不打印
+* 混淆合并，自带flutter和bugly相关混淆规则
 ## 0.2.3+1
 * 修复useCache取值不正确的问题
 ## 0.2.3

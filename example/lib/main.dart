@@ -36,6 +36,7 @@ class _HomePageState extends State<HomePage> {
     ).then((_result) {
       setState(() {
         _platformVersion = _result.message;
+        print(_result.appId);
       });
     });
     FlutterBugly.setUserId("user id");

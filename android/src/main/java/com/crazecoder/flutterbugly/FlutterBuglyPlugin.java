@@ -93,15 +93,16 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                         }
                     }
                 };
-                Bugly.init(activity.getApplicationContext(), call.argument("appId").toString(), BuildConfig.DEBUG);
+                String appId = call.argument("appId").toString();
+                Bugly.init(activity.getApplicationContext(), appId, BuildConfig.DEBUG);
                 if (call.hasArgument("channel")) {
                     String channel = call.argument("channel");
                     if (!TextUtils.isEmpty(channel))
                         Bugly.setAppChannel(activity.getApplicationContext(), channel);
                 }
-                result(getResultBean(true, "Bugly 初始化成功"));
+                result(getResultBean(true, appId,"Bugly 初始化成功"));
             } else {
-                result(getResultBean(false, "Bugly key不能为空"));
+                result(getResultBean(false, null,"Bugly appId不能为空"));
             }
         } else if (call.method.equals("setUserId")) {
             if (call.hasArgument("userId")) {
@@ -155,60 +156,63 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
             result(strategy);
         } else if (call.method.equals("postCatchedException")) {
-            String message = "";
-            String detail = null;
-            if (call.hasArgument("crash_message")) {
-                message = call.argument("crash_message");
-            }
-            if (call.hasArgument("crash_detail")) {
-                detail = call.argument("crash_detail");
-            }
-            if (TextUtils.isEmpty(detail)) return;
-            String[] details = detail.split("#");
-            List<StackTraceElement> elements = new ArrayList<>();
-            for (String s : details) {
-                if (!TextUtils.isEmpty(s)) {
-                    String methodName = null;
-                    String fileName = null;
-                    int lineNum = -1;
-                    String[] contents = s.split(" \\(");
-                    if (contents.length > 0) {
-                        methodName = contents[0];
-                        if (contents.length < 2) {
-                            break;
-                        }
-                        String packageContent = contents[1].replace(")", "");
-                        String[] packageContentArray = packageContent.split("\\.dart:");
-                        if (packageContentArray.length > 0) {
-                            if (packageContentArray.length == 1) {
-                                fileName = packageContentArray[0];
-                            } else {
-                                fileName = packageContentArray[0] + ".dart";
-                                Pattern patternTrace = Pattern.compile("[1-9]\\d*");
-                                Matcher m = patternTrace.matcher(packageContentArray[1]);
-                                if (m.find()) {
-                                    String lineNumStr = m.group();
-                                    lineNum = Integer.parseInt(lineNumStr);
-                                }
-                            }
-                        }
-                    }
-                    StackTraceElement element = new StackTraceElement("Dart", methodName, fileName, lineNum);
-                    elements.add(element);
-                }
-            }
-            Throwable throwable = new Throwable(message);
-            if (elements.size() > 0) {
-                StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
-                throwable.setStackTrace(elements.toArray(elementsArray));
-            }
-            CrashReport.postCatchedException(throwable);
+            postException(call);
             result(null);
         } else {
             result.notImplemented();
             isResultSubmitted = true;
         }
 
+    }
+    private void postException(MethodCall call){
+        String message = "";
+        String detail = null;
+        if (call.hasArgument("crash_message")) {
+            message = call.argument("crash_message");
+        }
+        if (call.hasArgument("crash_detail")) {
+            detail = call.argument("crash_detail");
+        }
+        if (TextUtils.isEmpty(detail)) return;
+        String[] details = detail.split("#");
+        List<StackTraceElement> elements = new ArrayList<>();
+        for (String s : details) {
+            if (!TextUtils.isEmpty(s)) {
+                String methodName = null;
+                String fileName = null;
+                int lineNum = -1;
+                String[] contents = s.split(" \\(");
+                if (contents.length > 0) {
+                    methodName = contents[0];
+                    if (contents.length < 2) {
+                        break;
+                    }
+                    String packageContent = contents[1].replace(")", "");
+                    String[] packageContentArray = packageContent.split("\\.dart:");
+                    if (packageContentArray.length > 0) {
+                        if (packageContentArray.length == 1) {
+                            fileName = packageContentArray[0];
+                        } else {
+                            fileName = packageContentArray[0] + ".dart";
+                            Pattern patternTrace = Pattern.compile("[1-9]\\d*");
+                            Matcher m = patternTrace.matcher(packageContentArray[1]);
+                            if (m.find()) {
+                                String lineNumStr = m.group();
+                                lineNum = Integer.parseInt(lineNumStr);
+                            }
+                        }
+                    }
+                }
+                StackTraceElement element = new StackTraceElement("Dart", methodName, fileName, lineNum);
+                elements.add(element);
+            }
+        }
+        Throwable throwable = new Throwable(message);
+        if (elements.size() > 0) {
+            StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
+            throwable.setStackTrace(elements.toArray(elementsArray));
+        }
+        CrashReport.postCatchedException(throwable);
     }
 
     private void result(Object object) {
@@ -222,9 +226,10 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         }
     }
 
-    private BuglyInitResultInfo getResultBean(boolean isSuccess, String msg) {
+    private BuglyInitResultInfo getResultBean(boolean isSuccess,String appId, String msg) {
         BuglyInitResultInfo bean = new BuglyInitResultInfo();
         bean.setSuccess(isSuccess);
+        bean.setAppId(appId);
         bean.setMessage(msg);
         return bean;
     }

@@ -24,13 +24,13 @@
           [Bugly startWithAppId:appId config:config];
           NSLog(@"Bugly appId: %@", appId);
 
-          NSDictionary * dict = @{@"message":@"Bugly 初始化成功", @"isSuccess":@YES};
+          NSDictionary * dict = @{@"message":@"Bugly 初始化成功",@"appId":appId, @"isSuccess":@YES};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
           NSString * json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-          
+
           result(json);
       }else{
-          NSDictionary * dict = @{@"message":@"Bugly 初始化失败", @"isSuccess":@NO};
+          NSDictionary * dict = @{@"message":@"Bugly appId不能为空", @"isSuccess":@NO};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
           NSString * json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
           
