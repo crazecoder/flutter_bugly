@@ -113,15 +113,7 @@ class FlutterBugly {
     var map = {};
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (FlutterErrorDetails details) async {
-      //默认debug下打印异常，不上传异常
-      if (_isDebug) {
-        // In development mode simply print to console.
-        handler == null
-            ? FlutterError.dumpErrorToConsole(details)
-            : handler(details);
-      } else {
         Zone.current.handleUncaughtError(details.exception, details.stack);
-      }
     };
 
     // This creates a [Zone] that contains the Flutter application and stablishes
@@ -138,6 +130,14 @@ class FlutterBugly {
     runZoned<Future<Null>>(() async {
       callback();
     }, onError: (error, stackTrace) async {
+      //默认debug下打印异常，不上传异常
+      if (_isDebug) {
+        var details = FlutterErrorDetails(exception: error, stack: stackTrace);
+        handler == null
+            ? FlutterError.dumpErrorToConsole(details)
+            : handler(details);
+        return;
+      }
       var errorStr = error.toString();
       //异常过滤
       if (filterRegExp != null) {

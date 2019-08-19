@@ -1,3 +1,5 @@
+## 0.2.4+1
+* 修复自动适配模式时，debug时网络请求会上报的问题
 ## 0.2.4
 * 自动适配debug、release模式。debug下只打印异常不上报，release只上报，不打印
 * 混淆合并，自带flutter和bugly相关混淆规则
