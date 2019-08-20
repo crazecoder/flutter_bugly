@@ -46,10 +46,16 @@
       if ([crash_detail isKindOfClass:[NSNull class]]) {
           crash_message = @"";
       }
-      NSException* ex = [[NSException alloc]initWithName:crash_message
-                                                  reason:crash_detail
-                                                userInfo:nil];
-      [Bugly reportException:ex];
+      NSArray *stackTraceArray = [crash_detail componentsSeparatedByString:@""];
+      NSMutableDictionary *dic=[NSMutableDictionary dictionary];
+
+
+      [Bugly reportExceptionWithCategory:5 name:crash_message reason:@" " callStack:stackTraceArray extraInfo:dic terminateApp:NO];
+
+//      NSException* ex = [[NSException alloc]initWithName:crash_message
+//                                                  reason:crash_detail
+//                                                userInfo:nil];
+//      [Bugly reportException:ex];
       result(nil);
   }else if([@"setUserId" isEqualToString:call.method]){
       NSString *userId = call.arguments[@"userId"];
