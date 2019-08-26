@@ -1,3 +1,5 @@
+## 0.2.6
+* android:networkSecurityConfig改为android:usesCleartextTraffic
 ## 0.2.5
 * 优化iOS和android异常上报控制台排版格式
 ## 0.2.4+1
