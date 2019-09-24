@@ -125,7 +125,7 @@ class FlutterBugly {
       if (_error is CustomException) {
         data = _error.map;
       }
-      _uploadError(_error.toString(), _stackTraceStr, data: data);
+      uploadException(_error.toString(), _stackTraceStr, data: data);
     }).sendPort);
     // This creates a [Zone] that contains the Flutter application and stablishes
     // an error handler that captures errors and reports them.
@@ -162,11 +162,11 @@ class FlutterBugly {
       if (error is CustomException) {
         data = error.map;
       }
-      _uploadError(errorStr, stackTrace.toString(), data: data);
+      uploadException(errorStr, stackTrace.toString(), data: data);
     });
   }
 
-  static Future<Null> _uploadError(String _errorStr, String _stackTraceStr,
+  static Future<Null> uploadException(String _errorStr, String _stackTraceStr,
       {Map data}) async {
     var map = {};
     map.putIfAbsent("crash_message", () => _errorStr);
