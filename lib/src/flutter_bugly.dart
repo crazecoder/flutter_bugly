@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bugly/src/custom_exception.dart';
 import 'dart:convert';
 import 'bean/upgrade_info.dart';
 import 'bean/init_result_info.dart';
@@ -107,15 +109,24 @@ class FlutterBugly {
     T callback(), {
     FlutterExceptionHandler handler, //异常捕捉，用于自定义打印异常
     String filterRegExp, //异常上报过滤正则，针对message
+    bool debugUpload = false,
   }) {
     bool _isDebug = false;
     assert(_isDebug = true);
-    var map = {};
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (FlutterErrorDetails details) async {
-        Zone.current.handleUncaughtError(details.exception, details.stack);
+      Zone.current.handleUncaughtError(details.exception, details.stack);
     };
-
+    Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) async {
+      var isolateError = pair as List<dynamic>;
+      var _error = isolateError.first;
+      var _stackTraceStr = isolateError.last.toString();
+      var data;
+      if (_error is CustomException) {
+        data = _error.map;
+      }
+      _uploadError(_error.toString(), _stackTraceStr, data: data);
+    }).sendPort);
     // This creates a [Zone] that contains the Flutter application and stablishes
     // an error handler that captures errors and reports them.
     //
@@ -131,7 +142,7 @@ class FlutterBugly {
       callback();
     }, onError: (error, stackTrace) async {
       //默认debug下打印异常，不上传异常
-      if (_isDebug) {
+      if (!debugUpload && _isDebug) {
         var details = FlutterErrorDetails(exception: error, stack: stackTrace);
         handler == null
             ? FlutterError.dumpErrorToConsole(details)
@@ -147,10 +158,21 @@ class FlutterBugly {
           return;
         }
       }
-      map.putIfAbsent("crash_message", () => errorStr);
-      map.putIfAbsent("crash_detail", () => stackTrace.toString());
-      await _channel.invokeMethod('postCatchedException', map);
+      var data;
+      if (error is CustomException) {
+        data = error.map;
+      }
+      _uploadError(errorStr, stackTrace.toString(), data: data);
     });
+  }
+
+  static Future<Null> _uploadError(String _errorStr, String _stackTraceStr,
+      {Map data}) async {
+    var map = {};
+    map.putIfAbsent("crash_message", () => _errorStr);
+    map.putIfAbsent("crash_detail", () => _stackTraceStr);
+    if (data != null) map.putIfAbsent("crash_data", () => data);
+    await _channel.invokeMethod('postCatchedException', map);
   }
 
   static UpgradeInfo _decodeUpgradeInfo(String jsonStr) {
@@ -158,5 +180,9 @@ class FlutterBugly {
     Map resultMap = json.decode(jsonStr);
     var info = UpgradeInfo.fromJson(resultMap);
     return info;
+  }
+  static Future<Null> throwException({String message,Map<String,String> data}) async{
+    CustomException exception = CustomException(message: message,map: data);
+    throw exception;
   }
 }
