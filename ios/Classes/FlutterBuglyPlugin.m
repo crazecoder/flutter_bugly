@@ -47,10 +47,12 @@
           crash_message = @"";
       }
       NSArray *stackTraceArray = [crash_detail componentsSeparatedByString:@""];
-      NSMutableDictionary *dic=[NSMutableDictionary dictionary];
+      NSDictionary *data = call.arguments[@"crash_data"];
+      if(data == nil){
+        data = [NSMutableDictionary dictionary];
+      }
 
-
-      [Bugly reportExceptionWithCategory:5 name:crash_message reason:@" " callStack:stackTraceArray extraInfo:dic terminateApp:NO];
+      [Bugly reportExceptionWithCategory:5 name:crash_message reason:@" " callStack:stackTraceArray extraInfo:data terminateApp:NO];
 
 //      NSException* ex = [[NSException alloc]initWithName:crash_message
 //                                                  reason:crash_detail

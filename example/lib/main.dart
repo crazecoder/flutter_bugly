@@ -5,9 +5,9 @@ import 'package:flutter_bugly/flutter_bugly.dart';
 
 import 'update_dialog.dart';
 
-void main() => FlutterBugly.postCatchedException(() {
-      runApp(MyApp());
-    });
+void main() => FlutterBugly.postCatchedException(
+      () => runApp(MyApp()),
+    );
 
 class MyApp extends StatelessWidget {
   @override

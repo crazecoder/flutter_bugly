@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.crazecoder.flutterbugly">
 
-    <application android:usesCleartextTraffic="true"
+    <application
+        android:usesCleartextTraffic="true"
         tools:targetApi="m">
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
