@@ -1,3 +1,7 @@
+## 0.2.7
+* 异常上报新增debugUpload字段，默认false
+* 异常上报新增uploadException方法
+* 新增setAppChannel方法
 ## 0.2.6
 * android:networkSecurityConfig改为android:usesCleartextTraffic
 ## 0.2.5

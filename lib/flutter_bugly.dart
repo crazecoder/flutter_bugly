@@ -2,4 +2,3 @@ library flutter_bugly;
 
 export 'src/flutter_bugly.dart';
 export 'src/bean/upgrade_info.dart';
-export 'src/custom_exception.dart';

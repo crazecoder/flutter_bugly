@@ -4,7 +4,6 @@ import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bugly/src/custom_exception.dart';
 import 'dart:convert';
 import 'bean/upgrade_info.dart';
 import 'bean/init_result_info.dart';
@@ -48,6 +47,14 @@ class FlutterBugly {
     Map resultMap = json.decode(result);
     var resultBean = InitResultInfo.fromJson(resultMap);
     return resultBean;
+  }
+
+  ///自定义渠道标识 android专用
+  static Future<Null> setAppChannel(String channel) async {
+    Map<String, Object> map = {
+      "channel": channel,
+    };
+    await _channel.invokeMethod('setAppChannel', map);
   }
 
   ///设置用户标识
@@ -120,12 +127,8 @@ class FlutterBugly {
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) async {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
-      var _stackTraceStr = isolateError.last.toString();
-      var data;
-      if (_error is CustomException) {
-        data = _error.map;
-      }
-      uploadException(_error.toString(), _stackTraceStr, data: data);
+      var _stackTrace = isolateError.last;
+      Zone.current.handleUncaughtError(_error, _stackTrace);
     }).sendPort);
     // This creates a [Zone] that contains the Flutter application and stablishes
     // an error handler that captures errors and reports them.
@@ -158,19 +161,18 @@ class FlutterBugly {
           return;
         }
       }
-      var data;
-      if (error is CustomException) {
-        data = error.map;
-      }
-      uploadException(errorStr, stackTrace.toString(), data: data);
+      uploadException(message: errorStr, detail: stackTrace.toString());
     });
   }
 
-  static Future<Null> uploadException(String _errorStr, String _stackTraceStr,
-      {Map data}) async {
+  ///上报自定义异常信息，data为文本附件
+  ///Android 错误分析=>跟踪数据=>extraMessage.txt
+  ///iOS 错误分析=>跟踪数据=>crash_attach.log
+  static Future<Null> uploadException(
+      {@required String message, @required String detail, Map data}) async {
     var map = {};
-    map.putIfAbsent("crash_message", () => _errorStr);
-    map.putIfAbsent("crash_detail", () => _stackTraceStr);
+    map.putIfAbsent("crash_message", () => message);
+    map.putIfAbsent("crash_detail", () => detail);
     if (data != null) map.putIfAbsent("crash_data", () => data);
     await _channel.invokeMethod('postCatchedException', map);
   }
@@ -180,9 +182,5 @@ class FlutterBugly {
     Map resultMap = json.decode(jsonStr);
     var info = UpgradeInfo.fromJson(resultMap);
     return info;
-  }
-  static Future<Null> throwException({String message,Map<String,String> data}) async{
-    CustomException exception = CustomException(message: message,map: data);
-    throw exception;
   }
 }
