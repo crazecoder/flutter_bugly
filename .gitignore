@@ -6,3 +6,7 @@
 pubspec.lock
 
 build/
+.idea/
+.gradle/
+*.iml
+.github/

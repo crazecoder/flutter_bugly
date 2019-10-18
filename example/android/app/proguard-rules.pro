@@ -47,12 +47,13 @@
 #-keep public class * extends android.app.backup.BackupAgentHelper
 #-keep public class * extends android.preference.Preference
 -keep class com.google.android.material.** {*;}
--keep class androidx.** {*;}
--keep public class * extends androidx.**
--keep interface androidx.** {*;}
+-keep class android.** {*;}
+-keep public class * extends android.**
+-keep interface android.** {*;}
 -dontwarn com.google.android.material.**
 -dontnote com.google.android.material.**
--dontwarn androidx.**
+-dontwarn android.**
+-dontwarn com.tencent.**
 
 -keepclasseswithmembernames class * {
     native <methods>;
@@ -74,3 +75,7 @@
 -keepclasseswithmembernames class android.support.design.widget.** {
     *;
 }
+
+
+#忽略所有警告
+-ignorewarnings

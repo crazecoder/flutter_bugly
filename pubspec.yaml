@@ -21,6 +21,7 @@ flutter:
   # be modified. They are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
   plugin:
+    androidX: false
     androidPackage: com.crazecoder.flutterbugly
     pluginClass: FlutterBuglyPlugin
 
