@@ -26,18 +26,23 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'proguard-rules.pro'
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //consumerProguardFiles 'proguard-rules.pro'
+        // 开启multidex
+        //multiDexEnabled true
 
     }
     lintOptions {
         disable 'InvalidPackage'
     }
     buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+        //debug {
+        //    minifyEnabled false
+        //    //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        //}
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -45,9 +50,25 @@ android {
     }
 }
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     //注释掉原有bugly的仓库
-    //compile 'com.tencent.bugly:crashreport:latest.release'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.3.2
-    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.2.0
-    implementation 'com.tencent.bugly:nativecrashreport:3.7.1' //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    //implementation 'com.tencent.bugly:crashreport:3.0.0'
+    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'
+    implementation 'com.tencent.bugly:nativecrashreport:3.7.1'
+    //implementation 'com.android.support:recyclerview-v7:28.0.0'
+    //implementation 'com.android.support:appcompat-v7:28.0.0'
+    // https://mvnrepository.com/artifact/com.android.support/support-compat
+    implementation 'com.android.support:support-compat:28.0.0'
+    // https://mvnrepository.com/artifact/com.android.support/support-v4
+    implementation 'com.android.support:support-v4:28.0.0'
+
+    // 指定tinker依赖版本（注：应用升级1.3.5版本起，不再内置tinker）
+    // https://mvnrepository.com/artifact/com.tencent.tinker/tinker-android-lib
+    implementation 'com.tencent.tinker:tinker-android-lib:1.9.13.1'
+
 }
