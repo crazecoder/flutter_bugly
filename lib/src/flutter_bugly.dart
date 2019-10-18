@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +47,14 @@ class FlutterBugly {
     Map resultMap = json.decode(result);
     var resultBean = InitResultInfo.fromJson(resultMap);
     return resultBean;
+  }
+
+  ///自定义渠道标识 android专用
+  static Future<Null> setAppChannel(String channel) async {
+    Map<String, Object> map = {
+      "channel": channel,
+    };
+    await _channel.invokeMethod('setAppChannel', map);
   }
 
   ///设置用户标识
@@ -107,15 +116,20 @@ class FlutterBugly {
     T callback(), {
     FlutterExceptionHandler handler, //异常捕捉，用于自定义打印异常
     String filterRegExp, //异常上报过滤正则，针对message
+    bool debugUpload = false,
   }) {
     bool _isDebug = false;
     assert(_isDebug = true);
-    var map = {};
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (FlutterErrorDetails details) async {
-        Zone.current.handleUncaughtError(details.exception, details.stack);
+      Zone.current.handleUncaughtError(details.exception, details.stack);
     };
-
+    Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) async {
+      var isolateError = pair as List<dynamic>;
+      var _error = isolateError.first;
+      var _stackTrace = isolateError.last;
+      Zone.current.handleUncaughtError(_error, _stackTrace);
+    }).sendPort);
     // This creates a [Zone] that contains the Flutter application and stablishes
     // an error handler that captures errors and reports them.
     //
@@ -131,7 +145,7 @@ class FlutterBugly {
       callback();
     }, onError: (error, stackTrace) async {
       //默认debug下打印异常，不上传异常
-      if (_isDebug) {
+      if (!debugUpload && _isDebug) {
         var details = FlutterErrorDetails(exception: error, stack: stackTrace);
         handler == null
             ? FlutterError.dumpErrorToConsole(details)
@@ -147,10 +161,20 @@ class FlutterBugly {
           return;
         }
       }
-      map.putIfAbsent("crash_message", () => errorStr);
-      map.putIfAbsent("crash_detail", () => stackTrace.toString());
-      await _channel.invokeMethod('postCatchedException', map);
+      uploadException(message: errorStr, detail: stackTrace.toString());
     });
+  }
+
+  ///上报自定义异常信息，data为文本附件
+  ///Android 错误分析=>跟踪数据=>extraMessage.txt
+  ///iOS 错误分析=>跟踪数据=>crash_attach.log
+  static Future<Null> uploadException(
+      {@required String message, @required String detail, Map data}) async {
+    var map = {};
+    map.putIfAbsent("crash_message", () => message);
+    map.putIfAbsent("crash_detail", () => detail);
+    if (data != null) map.putIfAbsent("crash_data", () => data);
+    await _channel.invokeMethod('postCatchedException', map);
   }
 
   static UpgradeInfo _decodeUpgradeInfo(String jsonStr) {

@@ -13,6 +13,8 @@ import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import java.util.Map;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -95,10 +97,16 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                     if (!TextUtils.isEmpty(channel))
                         Bugly.setAppChannel(activity.getApplicationContext(), channel);
                 }
-                result(getResultBean(true, appId,"Bugly 初始化成功"));
+                result(getResultBean(true, appId, "Bugly 初始化成功"));
             } else {
-                result(getResultBean(false, null,"Bugly appId不能为空"));
+                result(getResultBean(false, null, "Bugly appId不能为空"));
             }
+        } else if (call.method.equals("setAppChannel")) {
+            if (call.hasArgument("channel")) {
+                String channel = call.argument("channel");
+                Bugly.setAppChannel(activity.getApplicationContext(), channel);
+            }
+            result(null);
         } else if (call.method.equals("setUserId")) {
             if (call.hasArgument("userId")) {
                 String userId = call.argument("userId");
@@ -136,12 +144,12 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             callback = new UpgradeCallback() {
                 @Override
                 public void onUpgrade(UpgradeInfo strategy) {
-                    if(finalUseCache){
+                    if (finalUseCache) {
                         if (strategy != null) {
                             upgradeInfo = strategy;
                         }
                         result(upgradeInfo);
-                    }else {
+                    } else {
                         result(strategy);
                     }
                 }
@@ -159,9 +167,11 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         }
 
     }
-    private void postException(MethodCall call){
+
+    private void postException(MethodCall call) {
         String message = "";
         String detail = null;
+        Map<String, String> map = null;
         if (call.hasArgument("crash_message")) {
             message = call.argument("crash_message");
         }
@@ -169,7 +179,10 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             detail = call.argument("crash_detail");
         }
         if (TextUtils.isEmpty(detail)) return;
-        CrashReport.postException(8,"Flutter Exception",message,detail,null);
+        if (call.hasArgument("crash_data")) {
+            map = call.argument("crash_data");
+        }
+        CrashReport.postException(8, "Flutter Exception", message, detail, map);
 
 //        String[] details = detail.split("#");
 //        List<StackTraceElement> elements = new ArrayList<>();
@@ -223,7 +236,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         }
     }
 
-    private BuglyInitResultInfo getResultBean(boolean isSuccess,String appId, String msg) {
+    private BuglyInitResultInfo getResultBean(boolean isSuccess, String appId, String msg) {
         BuglyInitResultInfo bean = new BuglyInitResultInfo();
         bean.setSuccess(isSuccess);
         bean.setAppId(appId);
