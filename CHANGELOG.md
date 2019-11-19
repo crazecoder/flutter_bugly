@@ -1,3 +1,5 @@
+## 0.2.8
+* android应用更新SDK升级到1.4.2
 ## 0.2.7
 * 异常上报新增debugUpload字段，默认false
 * 异常上报新增uploadException方法

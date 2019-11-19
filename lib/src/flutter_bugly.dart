@@ -121,10 +121,10 @@ class FlutterBugly {
     bool _isDebug = false;
     assert(_isDebug = true);
     // This captures errors reported by the Flutter framework.
-    FlutterError.onError = (FlutterErrorDetails details) async {
+    FlutterError.onError = (details) {
       Zone.current.handleUncaughtError(details.exception, details.stack);
     };
-    Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) async {
+    Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
       var _stackTrace = isolateError.last;
@@ -143,26 +143,59 @@ class FlutterBugly {
     // - https://www.dartlang.org/articles/libraries/zones
     runZoned<Future<Null>>(() async {
       callback();
-    }, onError: (error, stackTrace) async {
-      //默认debug下打印异常，不上传异常
-      if (!debugUpload && _isDebug) {
-        var details = FlutterErrorDetails(exception: error, stack: stackTrace);
-        handler == null
-            ? FlutterError.dumpErrorToConsole(details)
-            : handler(details);
-        return;
-      }
-      var errorStr = error.toString();
-      //异常过滤
-      if (filterRegExp != null) {
-        RegExp reg = new RegExp(filterRegExp);
-        Iterable<Match> matches = reg.allMatches(errorStr);
-        if (matches.length > 0) {
-          return;
-        }
-      }
-      uploadException(message: errorStr, detail: stackTrace.toString());
+    }, onError: (error, stackTrace) {
+      _filterAndUploadException(
+        debugUpload,
+        _isDebug,
+        handler,
+        filterRegExp,
+        FlutterErrorDetails(exception: error, stack: stackTrace),
+      );
     });
+  }
+
+  static void _filterAndUploadException(
+    debugUpload,
+    _isDebug,
+    handler,
+    filterRegExp,
+    FlutterErrorDetails details,
+  ) {
+    if (!_filterException(
+      debugUpload,
+      _isDebug,
+      handler,
+      filterRegExp,
+      details,
+    )) {
+      uploadException(
+          message: details.exception.toString(),
+          detail: details.stack.toString());
+    }
+  }
+
+  static bool _filterException(
+      bool debugUpload,
+      bool _isDebug,
+      FlutterExceptionHandler handler,
+      String filterRegExp,
+      FlutterErrorDetails details) {
+    //默认debug下打印异常，不上传异常
+    if (!debugUpload && _isDebug) {
+      handler == null
+          ? FlutterError.dumpErrorToConsole(details)
+          : handler(details);
+      return true;
+    }
+    //异常过滤
+    if (filterRegExp != null) {
+      RegExp reg = new RegExp(filterRegExp);
+      Iterable<Match> matches = reg.allMatches(details.exception.toString());
+      if (matches.length > 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   ///上报自定义异常信息，data为文本附件
