@@ -3,6 +3,8 @@ package com.crazecoder.flutterbugly;
 import android.app.Activity;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
 import com.crazecoder.flutterbugly.callback.UpgradeCallback;
 import com.crazecoder.flutterbugly.utils.JsonUtil;
@@ -15,6 +17,9 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Map;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -24,7 +29,12 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /**
  * FlutterBuglyPlugin
  */
-public class FlutterBuglyPlugin implements MethodCallHandler {
+public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
+
+    private @Nullable
+    FlutterPluginBinding flutterPluginBinding;
+
+    private MethodChannel channel;
     private Activity activity;
     private Result result;
     private boolean isResultSubmitted = false;
@@ -32,17 +42,17 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
     private static UpgradeCallback callback;
 
 
-    public FlutterBuglyPlugin(Activity activity) {
-        this.activity = activity;
+    public FlutterBuglyPlugin() {
     }
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
-        FlutterBuglyPlugin plugin = new FlutterBuglyPlugin(registrar.activity());
-        channel.setMethodCallHandler(plugin);
+        FlutterBuglyPlugin plugin = new FlutterBuglyPlugin();
+        plugin.channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
+        plugin.activity = registrar.activity();
+        plugin.channel.setMethodCallHandler(plugin);
     }
 
     @Override
@@ -242,5 +252,45 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         bean.setAppId(appId);
         bean.setMessage(msg);
         return bean;
+    }
+
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
+        this.flutterPluginBinding = binding;
+    }
+
+    @Override
+    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+        this.flutterPluginBinding = null;
+    }
+
+    @Override
+    public void onAttachedToActivity(ActivityPluginBinding binding) {
+        channel =
+                new MethodChannel(
+                        flutterPluginBinding.getBinaryMessenger(), "crazecoder/flutter_bugly");
+        activity = binding.getActivity();
+        channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        onDetachedFromActivity();
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+        onAttachedToActivity(binding);
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        if (channel == null) {
+            // Could be on too low of an SDK to have started listening originally.
+            return;
+        }
+
+        channel.setMethodCallHandler(null);
+        channel = null;
     }
 }
