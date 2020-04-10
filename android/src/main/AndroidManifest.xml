@@ -4,7 +4,7 @@
     package="com.crazecoder.flutterbugly">
 
     <application
-        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="m">
 
         <provider
