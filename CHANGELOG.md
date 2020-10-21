@@ -1,3 +1,7 @@
+## 0.2.9
+* nativecrashreport SDK升级到3.7.5
+* 升级Android embedding v2
+* 修改FileProvider与第三库冲突 [@linyf0721](https://github.com/linyf0721)
 ## 0.2.8
 * android应用更新SDK升级到1.4.2
 ## 0.2.7
