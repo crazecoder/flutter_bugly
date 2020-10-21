@@ -30,6 +30,10 @@ dependencies:
 在android/app/build.gradle的android下加入
 
 ```gradle
+    lintOptions {
+        //如打包出现Failed to transform libs.jar to match attributes
+        checkReleaseBuilds false
+    }
     defaultConfig {
         ndk {
             //设置支持的SO库架构
