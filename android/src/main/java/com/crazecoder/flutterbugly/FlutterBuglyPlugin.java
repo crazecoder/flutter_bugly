@@ -1,7 +1,10 @@
 package com.crazecoder.flutterbugly;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
 import com.crazecoder.flutterbugly.callback.UpgradeCallback;
@@ -13,8 +16,9 @@ import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.crashreport.CrashReport;
 
-import java.util.Map;
-
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -24,25 +28,25 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /**
  * FlutterBuglyPlugin
  */
-public class FlutterBuglyPlugin implements MethodCallHandler {
-    private Activity activity;
+public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
     private Result result;
     private boolean isResultSubmitted = false;
     private UpgradeInfo upgradeInfo;
     private static UpgradeCallback callback;
+    private MethodChannel channel;
+    @SuppressLint("StaticFieldLeak")
+    private static Activity activity;
+    private FlutterPluginBinding flutterPluginBinding;
 
-
-    public FlutterBuglyPlugin(Activity activity) {
-        this.activity = activity;
-    }
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
-        FlutterBuglyPlugin plugin = new FlutterBuglyPlugin(registrar.activity());
+        FlutterBuglyPlugin plugin = new FlutterBuglyPlugin();
         channel.setMethodCallHandler(plugin);
+        activity = registrar.activity();
     }
 
     @Override
@@ -97,16 +101,10 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
                     if (!TextUtils.isEmpty(channel))
                         Bugly.setAppChannel(activity.getApplicationContext(), channel);
                 }
-                result(getResultBean(true, appId, "Bugly 初始化成功"));
+                result(getResultBean(true, appId,"Bugly 初始化成功"));
             } else {
-                result(getResultBean(false, null, "Bugly appId不能为空"));
+                result(getResultBean(false, null,"Bugly appId不能为空"));
             }
-        } else if (call.method.equals("setAppChannel")) {
-            if (call.hasArgument("channel")) {
-                String channel = call.argument("channel");
-                Bugly.setAppChannel(activity.getApplicationContext(), channel);
-            }
-            result(null);
         } else if (call.method.equals("setUserId")) {
             if (call.hasArgument("userId")) {
                 String userId = call.argument("userId");
@@ -144,12 +142,12 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             callback = new UpgradeCallback() {
                 @Override
                 public void onUpgrade(UpgradeInfo strategy) {
-                    if (finalUseCache) {
+                    if(finalUseCache){
                         if (strategy != null) {
                             upgradeInfo = strategy;
                         }
                         result(upgradeInfo);
-                    } else {
+                    }else {
                         result(strategy);
                     }
                 }
@@ -167,11 +165,9 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         }
 
     }
-
-    private void postException(MethodCall call) {
+    private void postException(MethodCall call){
         String message = "";
         String detail = null;
-        Map<String, String> map = null;
         if (call.hasArgument("crash_message")) {
             message = call.argument("crash_message");
         }
@@ -179,10 +175,7 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
             detail = call.argument("crash_detail");
         }
         if (TextUtils.isEmpty(detail)) return;
-        if (call.hasArgument("crash_data")) {
-            map = call.argument("crash_data");
-        }
-        CrashReport.postException(8, "Flutter Exception", message, detail, map);
+        CrashReport.postException(8,"Flutter Exception",message,detail,null);
 
 //        String[] details = detail.split("#");
 //        List<StackTraceElement> elements = new ArrayList<>();
@@ -236,11 +229,43 @@ public class FlutterBuglyPlugin implements MethodCallHandler {
         }
     }
 
-    private BuglyInitResultInfo getResultBean(boolean isSuccess, String appId, String msg) {
+    private BuglyInitResultInfo getResultBean(boolean isSuccess,String appId, String msg) {
         BuglyInitResultInfo bean = new BuglyInitResultInfo();
         bean.setSuccess(isSuccess);
         bean.setAppId(appId);
         bean.setMessage(msg);
         return bean;
+    }
+
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        this.flutterPluginBinding = binding;
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        channel.setMethodCallHandler(null);
+    }
+
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        activity = binding.getActivity();
+        channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "crazecoder/flutter_bugly");
+        channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        flutterPluginBinding = null;
     }
 }
