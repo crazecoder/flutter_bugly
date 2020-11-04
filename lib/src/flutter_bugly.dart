@@ -13,6 +13,7 @@ class FlutterBugly {
 
   static const MethodChannel _channel =
       const MethodChannel('crazecoder/flutter_bugly');
+  static final _onCheckUpgrade = StreamController<UpgradeInfo>.broadcast();
 
   ///初始化
   static Future<InitResultInfo> init({
@@ -31,6 +32,8 @@ class FlutterBugly {
   }) async {
     assert((Platform.isAndroid && androidAppId != null) ||
         (Platform.isIOS && iOSAppId != null));
+    _channel.setMethodCallHandler(_handleMessages);
+
     Map<String, Object> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "channel": channel,
@@ -47,6 +50,15 @@ class FlutterBugly {
     Map resultMap = json.decode(result);
     var resultBean = InitResultInfo.fromJson(resultMap);
     return resultBean;
+  }
+
+  static Future<Null> _handleMessages(MethodCall call) async {
+    switch (call.method) {
+      case 'onCheckUpgrade':
+        UpgradeInfo _info = _decodeUpgradeInfo(call.arguments["upgradeInfo"]);
+        _onCheckUpgrade.add(_info);
+        break;
+    }
   }
 
   ///自定义渠道标识 android专用
@@ -95,20 +107,21 @@ class FlutterBugly {
 
   ///检查更新
   ///return 更新策略信息
-  static Future<UpgradeInfo> checkUpgrade({
+  static Future<Null> checkUpgrade({
     bool isManual = false,
     bool isSilence = false,
-    bool useCache = true,
+    // bool useCache = true,
   }) async {
     if (!Platform.isAndroid) return null;
     Map<String, Object> map = {
       "isManual": isManual, //用户手动点击检查，非用户点击操作请传false
       "isSilence": isSilence, //是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
-      "useCache": useCache, //是否使用第一次缓存的更新策略，false为实时的，但是bugly会可能返回null
+      // "useCache": useCache, //是否使用第一次缓存的更新策略，false为实时的，但是bugly会可能返回null
     };
-    final String result = await _channel.invokeMethod('checkUpgrade', map);
-    var info = _decodeUpgradeInfo(result);
-    return info;
+    // final String result =
+    await _channel.invokeMethod('checkUpgrade', map);
+    // var info = _decodeUpgradeInfo(result);
+    // return info;
   }
 
   ///异常上报
@@ -215,5 +228,11 @@ class FlutterBugly {
     Map resultMap = json.decode(jsonStr);
     var info = UpgradeInfo.fromJson(resultMap);
     return info;
+  }
+
+  static Stream<UpgradeInfo> get onCheckUpgrade => _onCheckUpgrade.stream; 
+
+  static void dispose(){
+    _onCheckUpgrade.close();
   }
 }

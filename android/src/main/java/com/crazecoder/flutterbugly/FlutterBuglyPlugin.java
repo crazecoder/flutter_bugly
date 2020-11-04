@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
-import com.crazecoder.flutterbugly.callback.UpgradeCallback;
 import com.crazecoder.flutterbugly.utils.JsonUtil;
 import com.crazecoder.flutterbugly.utils.MapUtil;
 import com.tencent.bugly.Bugly;
@@ -15,6 +14,9 @@ import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.crashreport.CrashReport;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -31,8 +33,6 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
     private Result result;
     private boolean isResultSubmitted = false;
-    private UpgradeInfo upgradeInfo;
-    private static UpgradeCallback callback;
     private MethodChannel channel;
     @SuppressLint("StaticFieldLeak")
     private static Activity activity;
@@ -89,9 +89,9 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                 Beta.upgradeListener = new UpgradeListener() {
                     @Override
                     public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                        if (callback != null) {
-                            callback.onUpgrade(strategy);
-                        }
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("upgradeInfo", JsonUtil.toJson(MapUtil.deepToMap(strategy)));
+                            channel.invokeMethod("onCheckUpgrade", data);
                     }
                 };
                 String appId = call.argument("appId").toString();
@@ -128,30 +128,12 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         } else if (call.method.equals("checkUpgrade")) {
             boolean isManual = false;
             boolean isSilence = false;
-            boolean useCache = true;
             if (call.hasArgument("isManual")) {
                 isManual = call.argument("isManual");
             }
             if (call.hasArgument("isSilence")) {
                 isSilence = call.argument("isSilence");
             }
-            if (call.hasArgument("useCache")) {
-                useCache = call.argument("useCache");
-            }
-            final boolean finalUseCache = useCache;
-            callback = new UpgradeCallback() {
-                @Override
-                public void onUpgrade(UpgradeInfo strategy) {
-                    if(finalUseCache){
-                        if (strategy != null) {
-                            upgradeInfo = strategy;
-                        }
-                        result(upgradeInfo);
-                    }else {
-                        result(strategy);
-                    }
-                }
-            };
             Beta.checkUpgrade(isManual, isSilence);
         } else if (call.method.equals("getUpgradeInfo")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
@@ -177,45 +159,6 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         if (TextUtils.isEmpty(detail)) return;
         CrashReport.postException(8,"Flutter Exception",message,detail,null);
 
-//        String[] details = detail.split("#");
-//        List<StackTraceElement> elements = new ArrayList<>();
-//        for (String s : details) {
-//            if (!TextUtils.isEmpty(s)) {
-//                String methodName = null;
-//                String fileName = null;
-//                int lineNum = -1;
-//                String[] contents = s.split(" \\(");
-//                if (contents.length > 0) {
-//                    methodName = contents[0];
-//                    if (contents.length < 2) {
-//                        break;
-//                    }
-//                    String packageContent = contents[1].replace(")", "");
-//                    String[] packageContentArray = packageContent.split("\\.dart:");
-//                    if (packageContentArray.length > 0) {
-//                        if (packageContentArray.length == 1) {
-//                            fileName = packageContentArray[0];
-//                        } else {
-//                            fileName = packageContentArray[0] + ".dart";
-//                            Pattern patternTrace = Pattern.compile("[1-9]\\d*");
-//                            Matcher m = patternTrace.matcher(packageContentArray[1]);
-//                            if (m.find()) {
-//                                String lineNumStr = m.group();
-//                                lineNum = Integer.parseInt(lineNumStr);
-//                            }
-//                        }
-//                    }
-//                }
-//                StackTraceElement element = new StackTraceElement("Dart", methodName, fileName, lineNum);
-//                elements.add(element);
-//            }
-//        }
-//        Throwable throwable = new Throwable(message);
-//        if (elements.size() > 0) {
-//            StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
-//            throwable.setStackTrace(elements.toArray(elementsArray));
-//        }
-//        CrashReport.postCatchedException(throwable);
     }
 
     private void result(Object object) {
