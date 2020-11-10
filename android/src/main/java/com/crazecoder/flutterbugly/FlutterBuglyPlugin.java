@@ -33,7 +33,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
     private Result result;
     private boolean isResultSubmitted = false;
-    private MethodChannel channel;
+    private static MethodChannel channel;
     @SuppressLint("StaticFieldLeak")
     private static Activity activity;
     private FlutterPluginBinding flutterPluginBinding;
