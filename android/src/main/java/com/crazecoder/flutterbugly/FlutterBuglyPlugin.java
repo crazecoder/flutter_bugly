@@ -43,7 +43,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
+        channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
         FlutterBuglyPlugin plugin = new FlutterBuglyPlugin();
         channel.setMethodCallHandler(plugin);
         activity = registrar.activity();
