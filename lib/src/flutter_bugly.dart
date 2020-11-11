@@ -64,8 +64,8 @@ class FlutterBugly {
           _onCheckUpgrade.add(_info);
         } else {
           if (_count < _checkUpgradeCount) {
-            checkUpgrade(isManual:false,);
             _count++;
+            checkUpgrade(isManual:false,);
           }
         }
         break;
