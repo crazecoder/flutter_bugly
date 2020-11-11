@@ -1,3 +1,5 @@
+## 0.3.0+1
+* 修复无限检查更新的问题
 ## 0.3.0
 * 使用MethodCallHandler获取upgradeInfo
 * 新增checkUpgradeCount参数

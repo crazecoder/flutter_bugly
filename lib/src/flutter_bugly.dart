@@ -58,14 +58,13 @@ class FlutterBugly {
   static Future<Null> _handleMessages(MethodCall call) async {
     switch (call.method) {
       case 'onCheckUpgrade':
-        print("checked");
         UpgradeInfo _info = _decodeUpgradeInfo(call.arguments["upgradeInfo"]);
         if (_info != null && _info.apkUrl != null) {
           _count = 0;
           _onCheckUpgrade.add(_info);
         } else {
           if (_count < _checkUpgradeCount) {
-            checkUpgrade();
+            checkUpgrade(isManual:false,);
             _count++;
           }
         }
