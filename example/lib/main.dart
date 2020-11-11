@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     FlutterBugly.init(
-      androidAppId: "your android id",
+      androidAppId: "your app id",
       iOSAppId: "your app id",
     ).then((_result) {
       setState(() {
@@ -39,11 +39,22 @@ class _HomePageState extends State<HomePage> {
         print(_result.appId);
       });
     });
+    FlutterBugly.onCheckUpgrade.listen((_upgradeInfo) {
+        _showUpdateDialog(_upgradeInfo.newFeature, _upgradeInfo.apkUrl,
+            _upgradeInfo.upgradeType == 2);
+    });
     FlutterBugly.setUserId("user id");
     FlutterBugly.putUserData(key: "key", value: "value");
     int tag = 9527;
     FlutterBugly.setUserTag(tag);
-    if (mounted) _checkUpgrade();
+    //autoCheckUpgrade为true时，可以不用调用
+    // if (mounted) _checkUpgrade();
+  }
+
+  @override
+  void dispose() {
+    FlutterBugly.dispose();
+    super.dispose();
   }
 
   @override
@@ -75,12 +86,7 @@ class _HomePageState extends State<HomePage> {
 
   void _checkUpgrade() {
     print("获取更新中。。。");
-    FlutterBugly.checkUpgrade().then((UpgradeInfo info) {
-      if (info != null && info.id != null) {
-        print("----------------${info.apkUrl}");
-        _showUpdateDialog(info.newFeature, info.apkUrl, info.upgradeType == 2);
-      }
-    });
+    FlutterBugly.checkUpgrade();
   }
 
   Widget _buildDialog(String version, String url, bool isForceUpgrade) {

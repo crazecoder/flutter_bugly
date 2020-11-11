@@ -14,6 +14,8 @@ class FlutterBugly {
   static const MethodChannel _channel =
       const MethodChannel('crazecoder/flutter_bugly');
   static final _onCheckUpgrade = StreamController<UpgradeInfo>.broadcast();
+  static int _checkUpgradeCount = 0;
+  static int _count = 0;
 
   ///初始化
   static Future<InitResultInfo> init({
@@ -28,12 +30,13 @@ class FlutterBugly {
     bool showInterruptedStrategy = true, //设置开启显示打断策略
     bool canShowApkInfo = true, //设置是否显示弹窗中的apk信息
     int initDelay = 0, //延迟初始化,单位秒
-    int upgradeCheckPeriod = 60, //升级检查周期设置,单位秒
+    int upgradeCheckPeriod = 0, //升级检查周期设置,单位秒
+    int checkUpgradeCount = 1, //UpgradeInfo为null时，再次check的次数，经测试1为最佳
   }) async {
     assert((Platform.isAndroid && androidAppId != null) ||
         (Platform.isIOS && iOSAppId != null));
     _channel.setMethodCallHandler(_handleMessages);
-
+    _checkUpgradeCount = checkUpgradeCount;
     Map<String, Object> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "channel": channel,
@@ -55,8 +58,17 @@ class FlutterBugly {
   static Future<Null> _handleMessages(MethodCall call) async {
     switch (call.method) {
       case 'onCheckUpgrade':
+        print("checked");
         UpgradeInfo _info = _decodeUpgradeInfo(call.arguments["upgradeInfo"]);
-        _onCheckUpgrade.add(_info);
+        if (_info != null && _info.apkUrl != null) {
+          _count = 0;
+          _onCheckUpgrade.add(_info);
+        } else {
+          if (_count < _checkUpgradeCount) {
+            checkUpgrade();
+            _count++;
+          }
+        }
         break;
     }
   }
@@ -108,20 +120,16 @@ class FlutterBugly {
   ///检查更新
   ///return 更新策略信息
   static Future<Null> checkUpgrade({
-    bool isManual = false,
+    bool isManual = true,
     bool isSilence = false,
-    // bool useCache = true,
   }) async {
     if (!Platform.isAndroid) return null;
+    if (isManual) _count = 0;
     Map<String, Object> map = {
       "isManual": isManual, //用户手动点击检查，非用户点击操作请传false
       "isSilence": isSilence, //是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
-      // "useCache": useCache, //是否使用第一次缓存的更新策略，false为实时的，但是bugly会可能返回null
     };
-    // final String result =
     await _channel.invokeMethod('checkUpgrade', map);
-    // var info = _decodeUpgradeInfo(result);
-    // return info;
   }
 
   ///异常上报
@@ -230,9 +238,10 @@ class FlutterBugly {
     return info;
   }
 
-  static Stream<UpgradeInfo> get onCheckUpgrade => _onCheckUpgrade.stream; 
+  static Stream<UpgradeInfo> get onCheckUpgrade => _onCheckUpgrade.stream;
 
-  static void dispose(){
+  static void dispose() {
+    _count = 0;
     _onCheckUpgrade.close();
   }
 }

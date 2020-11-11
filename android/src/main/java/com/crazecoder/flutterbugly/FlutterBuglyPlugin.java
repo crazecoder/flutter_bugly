@@ -89,9 +89,9 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                 Beta.upgradeListener = new UpgradeListener() {
                     @Override
                     public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                            Map<String, Object> data = new HashMap<>();
-                            data.put("upgradeInfo", JsonUtil.toJson(MapUtil.deepToMap(strategy)));
-                            channel.invokeMethod("onCheckUpgrade", data);
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("upgradeInfo", JsonUtil.toJson(MapUtil.deepToMap(strategy)));
+                        channel.invokeMethod("onCheckUpgrade", data);
                     }
                 };
                 String appId = call.argument("appId").toString();
@@ -101,9 +101,9 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                     if (!TextUtils.isEmpty(channel))
                         Bugly.setAppChannel(activity.getApplicationContext(), channel);
                 }
-                result(getResultBean(true, appId,"Bugly 初始化成功"));
+                result(getResultBean(true, appId, "Bugly 初始化成功"));
             } else {
-                result(getResultBean(false, null,"Bugly appId不能为空"));
+                result(getResultBean(false, null, "Bugly appId不能为空"));
             }
         } else if (call.method.equals("setUserId")) {
             if (call.hasArgument("userId")) {
@@ -147,7 +147,8 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         }
 
     }
-    private void postException(MethodCall call){
+
+    private void postException(MethodCall call) {
         String message = "";
         String detail = null;
         if (call.hasArgument("crash_message")) {
@@ -157,7 +158,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
             detail = call.argument("crash_detail");
         }
         if (TextUtils.isEmpty(detail)) return;
-        CrashReport.postException(8,"Flutter Exception",message,detail,null);
+        CrashReport.postException(8, "Flutter Exception", message, detail, null);
 
     }
 
@@ -172,7 +173,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         }
     }
 
-    private BuglyInitResultInfo getResultBean(boolean isSuccess,String appId, String msg) {
+    private BuglyInitResultInfo getResultBean(boolean isSuccess, String appId, String msg) {
         BuglyInitResultInfo bean = new BuglyInitResultInfo();
         bean.setSuccess(isSuccess);
         bean.setAppId(appId);

@@ -1,3 +1,7 @@
+## 0.3.0
+* 使用MethodCallHandler获取upgradeInfo
+* 新增checkUpgradeCount参数
+* checkUpgrade不再返回UpgradeInfo，isManual默认改为true，删除useCache参数
 ## 0.2.9
 * nativecrashreport SDK升级到3.7.5
 * 升级Android embedding v2

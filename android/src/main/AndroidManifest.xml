@@ -5,7 +5,7 @@
 
     <application
         android:usesCleartextTraffic="true"
-        tools:targetApi="m">
+        tools:targetApi="n">
 
         <provider
             android:name="com.tencent.bugly.beta.utils.BuglyFileProvider"
