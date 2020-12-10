@@ -33,12 +33,14 @@ class _HomePageState extends State<HomePage> {
     FlutterBugly.init(
       androidAppId: "your app id",
       iOSAppId: "your app id",
+      customUpgrade: true,// 调用Android原生升级方式
     ).then((_result) {
       setState(() {
         _platformVersion = _result.message;
         print(_result.appId);
       });
     });
+    // 当配置 customUpgrade=true 时候，这里可以接收自定义升级
     FlutterBugly.onCheckUpgrade.listen((_upgradeInfo) {
         _showUpdateDialog(_upgradeInfo.newFeature, _upgradeInfo.apkUrl,
             _upgradeInfo.upgradeType == 2);
