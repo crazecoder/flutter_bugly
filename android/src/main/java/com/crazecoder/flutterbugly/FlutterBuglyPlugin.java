@@ -84,16 +84,20 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                 if (call.hasArgument("canShowApkInfo")) {
                     Beta.canShowApkInfo = call.argument("canShowApkInfo");
                 }
+                if (call.hasArgument("customUpgrade")) {
+                    boolean customUpgrade = call.argument("customUpgrade");
+                    /*在application中初始化时设置监听，监听策略的收取*/
+                    Beta.upgradeListener = customUpgrade ? new UpgradeListener() {
+                        @Override
+                        public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("upgradeInfo", JsonUtil.toJson(MapUtil.deepToMap(strategy)));
+                            channel.invokeMethod("onCheckUpgrade", data);
+                        }
+                    } : null;
+                }
                 Beta.canShowUpgradeActs.add(activity.getClass());
-                /*在application中初始化时设置监听，监听策略的收取*/
-                Beta.upgradeListener = new UpgradeListener() {
-                    @Override
-                    public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("upgradeInfo", JsonUtil.toJson(MapUtil.deepToMap(strategy)));
-                        channel.invokeMethod("onCheckUpgrade", data);
-                    }
-                };
+
                 String appId = call.argument("appId").toString();
                 Bugly.init(activity.getApplicationContext(), appId, BuildConfig.DEBUG);
                 if (call.hasArgument("channel")) {
