@@ -1,3 +1,7 @@
+## 0.3.1
+* 解决Androidx环境中调用原生升级无法弹框问题。@[zengxiangxin](https://github.com/zengxiangxin)
+* 升级 SDK 包 1.5.0
+* 升级 NDK 动态库 3.7.7
 ## 0.3.0+2
 * 修复无限检查更新的问题
 ## 0.3.0

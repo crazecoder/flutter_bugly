@@ -77,6 +77,7 @@ flutter build apk --release --target-platform android-arm
  bool enableNotification = false,//通知栏
  bool showInterruptedStrategy = true, //设置开启显示打断策略
  bool canShowApkInfo = true, //设置是否显示弹窗中的apk信息
+ bool customUpgrade = true, //设置是否使用flutter自定义窗口，false为bugly自带弹窗
  int initDelay = 0, //延迟初始化，单位秒
  int upgradeCheckPeriod = 0, //升级检查周期设置,单位秒
  
@@ -132,5 +133,5 @@ UpgradeInfo参数：
 
 ~~3、请勿在targetSdkVersion 26以上设置autoDownloadOnWifi = true，会导致在8.0以上机型更新策略没有反应~~
 
-4、因为版本更新弹窗封装进sdk，使用的是support包，所以使用androidx包时，请配合FlutterBugly.getUpgradeInfo()或者FlutterBugly.checkUpgrade()【两种方法区别见方法注释】方法自定义弹窗界面 [弹窗示例](https://github.com/crazecoder/flutter_bugly/commit/6052890cee63ec1e433501e1149852878fd234de)或者[有下载打开安装的完整示例](https://github.com/crazecoder/testsocket/blob/master/lib/ui/home.dart)
+~~4、因为版本更新弹窗封装进sdk，使用的是support包，所以使用androidx包时，请配合FlutterBugly.getUpgradeInfo()或者FlutterBugly.checkUpgrade()【两种方法区别见方法注释】方法自定义弹窗界面 [弹窗示例](https://github.com/crazecoder/flutter_bugly/commit/6052890cee63ec1e433501e1149852878fd234de)或者[有下载打开安装的完整示例](https://github.com/crazecoder/testsocket/blob/master/lib/ui/home.dart)~~
 

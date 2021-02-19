@@ -18,6 +18,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.BuildConfig;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -50,7 +51,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
     }
 
     @Override
-    public void onMethodCall(final MethodCall call, final Result result) {
+    public void onMethodCall(final MethodCall call, @NonNull final Result result) {
         isResultSubmitted = false;
         this.result = result;
         if (call.method.equals("initBugly")) {
