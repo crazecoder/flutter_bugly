@@ -194,6 +194,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
+        flutterPluginBinding = null;
     }
 
     @Override
@@ -215,6 +216,6 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
 
     @Override
     public void onDetachedFromActivity() {
-        flutterPluginBinding = null;
+        
     }
 }
