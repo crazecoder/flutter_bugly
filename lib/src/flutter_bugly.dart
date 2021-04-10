@@ -51,7 +51,7 @@ class FlutterBugly {
       "upgradeCheckPeriod": upgradeCheckPeriod,
       "customUpgrade": customUpgrade,
     };
-    final String result = await (_channel.invokeMethod('initBugly', map) as FutureOr<String>);
+    final dynamic result = await _channel.invokeMethod('initBugly', map);
     Map resultMap = json.decode(result);
     var resultBean = InitResultInfo.fromJson(resultMap as Map<String, dynamic>);
     return resultBean;
@@ -67,7 +67,9 @@ class FlutterBugly {
         } else {
           if (_count < _checkUpgradeCount) {
             _count++;
-            checkUpgrade(isManual:false,);
+            checkUpgrade(
+              isManual: false,
+            );
           }
         }
         break;
@@ -142,10 +144,6 @@ class FlutterBugly {
   }) {
     bool _isDebug = false;
     assert(_isDebug = true);
-    // This captures errors reported by the Flutter framework.
-    FlutterError.onError = (details) {
-      Zone.current.handleUncaughtError(details.exception, details.stack!);
-    };
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
@@ -174,6 +172,10 @@ class FlutterBugly {
         FlutterErrorDetails(exception: error, stack: stackTrace),
       );
     });
+    // This captures errors reported by the Flutter framework.
+    FlutterError.onError = (details) {
+      Zone.current.handleUncaughtError(details.exception, details.stack!);
+    };
   }
 
   static void _filterAndUploadException(
