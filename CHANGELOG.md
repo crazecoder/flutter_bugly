@@ -1,3 +1,5 @@
+## 0.3.2+1
+* flutterPluginBinding调整至onDetachedFromEngine释放。fix[#85](https://github.com/crazecoder/flutter_bugly/issues/85) @[shingohu](https://github.com/shingohu)
 ## 0.3.2
 * dartfmt
 * 修复部分场景不上报的问题

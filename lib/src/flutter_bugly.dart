@@ -104,8 +104,8 @@ class FlutterBugly {
   ///设置关键数据，随崩溃信息上报
   static Future<Null> putUserData(
       {required String key, required String value}) async {
-    assert(key != null && key.isNotEmpty);
-    assert(value != null && value.isNotEmpty);
+    assert(key.isNotEmpty);
+    assert(value.isNotEmpty);
     Map<String, Object> map = {
       "key": key,
       "value": value,
