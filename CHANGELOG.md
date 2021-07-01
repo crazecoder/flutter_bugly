@@ -1,3 +1,6 @@
+## 0.3.3
+* 升级 SDK 包 1.5.23
+* 修复布局越界时报Null check operator used on a null value的问题
 ## 0.3.2+1
 * flutterPluginBinding调整至onDetachedFromEngine释放。fix[#85](https://github.com/crazecoder/flutter_bugly/issues/85) @[shingohu](https://github.com/shingohu)
 ## 0.3.2
@@ -68,7 +71,6 @@
 ## 0.1.5+1
 * 升级 crashreport_upgrade:1.3.7，适配8.0通知栏，以及androidx的应用升级弹窗说明
 ## 0.1.4+2
-* fix crash when FileProvider not find 
+* fix crash when FileProvider not find
 ## 0.1.4+1
 * migrate to androidx
-
