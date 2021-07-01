@@ -33,17 +33,17 @@ class _HomePageState extends State<HomePage> {
     FlutterBugly.init(
       androidAppId: "your app id",
       iOSAppId: "your app id",
-      customUpgrade: true,// 调用Android原生升级方式
+      customUpgrade: true, // 调用Android原生升级方式
     ).then((_result) {
       setState(() {
-        _platformVersion = _result.message;
+        _platformVersion = _result.message!;
         print(_result.appId);
       });
     });
     // 当配置 customUpgrade=true 时候，这里可以接收自定义升级
     FlutterBugly.onCheckUpgrade.listen((_upgradeInfo) {
-        _showUpdateDialog(_upgradeInfo.newFeature, _upgradeInfo.apkUrl,
-            _upgradeInfo.upgradeType == 2);
+      _showUpdateDialog(_upgradeInfo.newFeature!, _upgradeInfo.apkUrl!,
+          _upgradeInfo.upgradeType == 2);
     });
     FlutterBugly.setUserId("user id");
     FlutterBugly.putUserData(key: "key", value: "value");
@@ -72,7 +72,9 @@ class _HomePageState extends State<HomePage> {
           }
         },
         child: Center(
-          child: Text('init result: $_platformVersion\n'),
+          child: Text(
+            'init result: $_platformVersion\n',
+          ),
         ),
       ),
     );
@@ -109,7 +111,7 @@ class _HomePageState extends State<HomePage> {
   //dio可以监听下载进度，调用此方法
   void _updateProgress(_progress) {
     setState(() {
-      _dialogKey.currentState.progress = _progress;
+      _dialogKey.currentState!.progress = _progress;
     });
   }
 }
