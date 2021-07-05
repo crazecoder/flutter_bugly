@@ -1,5 +1,5 @@
 group 'com.crazecoder.flutterbugly'
-version '1.0-SNAPSHOT'
+version '0.3.2+1'
 
 buildscript {
     repositories {
@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:4.1.0'
     }
 }
 

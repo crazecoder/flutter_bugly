@@ -3,10 +3,10 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_bugly'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter bugly plugin.'
+  s.version          = '0.3.2+1'
+  s.summary          = 'Flutter plugin for Tencent Bugly.'
   s.description      = <<-DESC
-A new Flutter bugly plugin.
+Flutter plugin for Tencent Bugly, Crash monitoring, Crash analysis, exception reporting, application update, data statistics, etc.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
