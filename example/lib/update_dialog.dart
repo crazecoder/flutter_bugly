@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class UpdateDialog extends StatefulWidget {
   final key;
   final version;
-  final Function onClickWhenDownload;
-  final Function onClickWhenNotDownload;
+  final Function? onClickWhenDownload;
+  final Function? onClickWhenNotDownload;
 
   UpdateDialog({
     this.key,
@@ -23,7 +23,7 @@ class UpdateDialogState extends State<UpdateDialog> {
   @override
   Widget build(BuildContext context) {
     var _textStyle =
-        new TextStyle(color: Theme.of(context).textTheme.body1.color);
+        new TextStyle(color: Theme.of(context).textTheme.body1!.color);
 
     return new AlertDialog(
       title: new Text(
@@ -46,10 +46,10 @@ class UpdateDialogState extends State<UpdateDialog> {
           ),
           onPressed: () {
             if (_downloadProgress != 0.0) {
-              widget.onClickWhenDownload("正在更新中");
+              widget.onClickWhenDownload!("正在更新中");
               return;
             }
-            widget.onClickWhenNotDownload();
+            widget.onClickWhenNotDownload!();
 //            Navigator.of(context).pop();
           },
         ),
