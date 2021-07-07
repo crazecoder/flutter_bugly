@@ -140,6 +140,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                 isSilence = call.argument("isSilence");
             }
             Beta.checkUpgrade(isManual, isSilence);
+            result(null);
         } else if (call.method.equals("getUpgradeInfo")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
             result(strategy);
