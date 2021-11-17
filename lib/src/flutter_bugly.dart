@@ -20,6 +20,7 @@ class FlutterBugly {
 
   static int _checkUpgradeCount = 0;
   static int _count = 0;
+  static bool _postCaught = false;
 
   /// 初始化
   static Future<InitResultInfo> init({
@@ -42,6 +43,7 @@ class FlutterBugly {
       (Platform.isAndroid && androidAppId != null) ||
           (Platform.isIOS && iOSAppId != null),
     );
+    assert(_postCaught, 'Run postCatchedException first.');
     _channel.setMethodCallHandler(_handleMessages);
     _checkUpgradeCount = checkUpgradeCount;
     Map<String, Object?> map = {
@@ -176,6 +178,7 @@ class FlutterBugly {
         FlutterError.presentError(details);
       }
     };
+    _postCaught = true;
   }
 
   static void _filterAndUploadException(
@@ -250,6 +253,6 @@ class FlutterBugly {
   static void dispose() {
     _count = 0;
     _onCheckUpgrade.close();
-    _postCatched = false;
+    _postCaught = false;
   }
 }
