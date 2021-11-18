@@ -11,31 +11,39 @@ import 'bean/init_result_info.dart';
 class FlutterBugly {
   FlutterBugly._();
 
-  static const MethodChannel _channel =
-      const MethodChannel('crazecoder/flutter_bugly');
-  static final _onCheckUpgrade = StreamController<UpgradeInfo>.broadcast();
+  static const MethodChannel _channel = MethodChannel(
+    'crazecoder/flutter_bugly',
+  );
+
+  static final StreamController<UpgradeInfo> _onCheckUpgrade =
+      StreamController<UpgradeInfo>.broadcast();
+
   static int _checkUpgradeCount = 0;
   static int _count = 0;
+  static bool _postCaught = false;
 
-  ///初始化
+  /// 初始化
   static Future<InitResultInfo> init({
     String? androidAppId,
     String? iOSAppId,
-    String? channel, //自定义渠道标识
+    String? channel, // 自定义渠道标识
     bool autoCheckUpgrade = true,
     bool autoInit = true,
     bool autoDownloadOnWifi = false,
     bool enableHotfix = false,
-    bool enableNotification = false, //未适配androidx
-    bool showInterruptedStrategy = true, //设置开启显示打断策略
-    bool canShowApkInfo = true, //设置是否显示弹窗中的apk信息
-    int initDelay = 0, //延迟初始化,单位秒
-    int upgradeCheckPeriod = 0, //升级检查周期设置,单位秒
-    int checkUpgradeCount = 1, //UpgradeInfo为null时，再次check的次数，经测试1为最佳
-    bool customUpgrade = true, // 是否自定义升级，这里默认true为了兼容老版本
+    bool enableNotification = false, // 未适配 androidx
+    bool showInterruptedStrategy = true, // 设置开启显示打断策略
+    bool canShowApkInfo = true, // 设置是否显示弹窗中的 apk 信息
+    int initDelay = 0, // 延迟初始化，单位秒
+    int upgradeCheckPeriod = 0, //升级检查周期设置，单位秒
+    int checkUpgradeCount = 1, // UpgradeInfo 为 null 时，再次 check 的次数，经测试 1 为最佳
+    bool customUpgrade = true, // 是否自定义升级，这里默认 true 为了兼容老版本
   }) async {
-    assert((Platform.isAndroid && androidAppId != null) ||
-        (Platform.isIOS && iOSAppId != null));
+    assert(
+      (Platform.isAndroid && androidAppId != null) ||
+          (Platform.isIOS && iOSAppId != null),
+    );
+    assert(_postCaught, 'Run postCatchedException first.');
     _channel.setMethodCallHandler(_handleMessages);
     _checkUpgradeCount = checkUpgradeCount;
     Map<String, Object?> map = {
@@ -67,49 +75,40 @@ class FlutterBugly {
         } else {
           if (_count < _checkUpgradeCount) {
             _count++;
-            checkUpgrade(
-              isManual: false,
-            );
+            checkUpgrade(isManual: false);
           }
         }
         break;
     }
   }
 
-  ///自定义渠道标识 android专用
+  /// 自定义渠道标识，Android 专用
   static Future<Null> setAppChannel(String channel) async {
-    Map<String, Object> map = {
-      "channel": channel,
-    };
+    Map<String, Object> map = {"channel": channel};
     await _channel.invokeMethod('setAppChannel', map);
   }
 
-  ///设置用户标识
+  /// 设置用户标识
   static Future<Null> setUserId(String userId) async {
-    Map<String, Object> map = {
-      "userId": userId,
-    };
+    Map<String, Object> map = {"userId": userId};
     await _channel.invokeMethod('setUserId', map);
   }
 
-  ///设置标签
-  ///userTag 标签ID，可在网站生成
+  /// 设置标签
+  /// [userTag] 标签 ID，可在网站生成
   static Future<Null> setUserTag(int userTag) async {
-    Map<String, Object> map = {
-      "userTag": userTag,
-    };
+    Map<String, Object> map = {"userTag": userTag};
     await _channel.invokeMethod('setUserTag', map);
   }
 
   ///设置关键数据，随崩溃信息上报
-  static Future<Null> putUserData(
-      {required String key, required String value}) async {
+  static Future<Null> putUserData({
+    required String key,
+    required String value,
+  }) async {
     assert(key.isNotEmpty);
     assert(value.isNotEmpty);
-    Map<String, Object> map = {
-      "key": key,
-      "value": value,
-    };
+    Map<String, Object> map = {"key": key, "value": value};
     await _channel.invokeMethod('putUserData', map);
   }
 
@@ -120,8 +119,7 @@ class FlutterBugly {
     return info;
   }
 
-  ///检查更新
-  ///return 更新策略信息
+  /// 检查更新，返回更新策略信息
   static Future<Null> checkUpgrade({
     bool isManual = true,
     bool isSilence = false,
@@ -129,17 +127,17 @@ class FlutterBugly {
     if (!Platform.isAndroid) return null;
     if (isManual) _count = 0;
     Map<String, Object> map = {
-      "isManual": isManual, //用户手动点击检查，非用户点击操作请传false
-      "isSilence": isSilence, //是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
+      "isManual": isManual, // 用户手动点击检查，非用户点击操作请传 false
+      "isSilence": isSilence, // 是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
     };
     await _channel.invokeMethod('checkUpgrade', map);
   }
 
-  ///异常上报
+  /// 异常上报
   static void postCatchedException<T>(
     T callback(), {
-    FlutterExceptionHandler? handler, //异常捕捉，用于自定义打印异常
-    String? filterRegExp, //异常上报过滤正则，针对message
+    FlutterExceptionHandler? handler, // 异常捕捉，用于自定义打印异常（处理后不再上报）
+    String? filterRegExp, // 异常上报过滤正则，针对 message
     bool debugUpload = false,
   }) {
     bool _isDebug = false;
@@ -180,6 +178,7 @@ class FlutterBugly {
         FlutterError.presentError(details);
       }
     };
+    _postCaught = true;
   }
 
   static void _filterAndUploadException(
@@ -203,19 +202,20 @@ class FlutterBugly {
   }
 
   static bool _filterException(
-      bool debugUpload,
-      bool _isDebug,
-      FlutterExceptionHandler? handler,
-      String? filterRegExp,
-      FlutterErrorDetails details) {
-    //默认debug下打印异常，不上传异常
+    bool debugUpload,
+    bool _isDebug,
+    FlutterExceptionHandler? handler,
+    String? filterRegExp,
+    FlutterErrorDetails details,
+  ) {
+    // 默认 debug 下打印异常，不上传异常
     if (!debugUpload && _isDebug) {
       handler == null
           ? FlutterError.dumpErrorToConsole(details)
           : handler(details);
       return true;
     }
-    //异常过滤
+    // 异常过滤
     if (filterRegExp != null) {
       RegExp reg = new RegExp(filterRegExp);
       Iterable<Match> matches = reg.allMatches(details.exception.toString());
@@ -226,11 +226,14 @@ class FlutterBugly {
     return false;
   }
 
-  ///上报自定义异常信息，data为文本附件
-  ///Android 错误分析=>跟踪数据=>extraMessage.txt
-  ///iOS 错误分析=>跟踪数据=>crash_attach.log
-  static Future<Null> uploadException(
-      {required String message, required String detail, Map? data}) async {
+  /// 上报自定义异常信息，data 为文本附件
+  /// Android 错误分析 => 跟踪数据 => extraMessage.txt
+  /// iOS 错误分析 => 跟踪数据 => crash_attach.log
+  static Future<Null> uploadException({
+    required String message,
+    required String detail,
+    Map? data,
+  }) async {
     var map = {};
     map.putIfAbsent("crash_message", () => message);
     map.putIfAbsent("crash_detail", () => detail);
@@ -250,5 +253,6 @@ class FlutterBugly {
   static void dispose() {
     _count = 0;
     _onCheckUpgrade.close();
+    _postCaught = false;
   }
 }
