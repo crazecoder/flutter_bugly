@@ -1,3 +1,9 @@
+## 0.3.5
+* 新增 `handlePredicate` 精细化 handler 处理
+## 0.3.4
+* 优化 `postCatchedException` 断言
+* 导出 `InitResultInfo`
+* 代码结构优化
 ## 0.3.3
 * 升级 SDK 包 1.5.23
 * 修复布局越界时报Null check operator used on a null value的问题
