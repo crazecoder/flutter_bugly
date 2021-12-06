@@ -139,9 +139,11 @@ class FlutterBugly {
     FlutterExceptionHandler? handler, // 异常捕捉，用于自定义打印异常（处理后不再上报）
     String? filterRegExp, // 异常上报过滤正则，针对 message
     bool debugUpload = false,
+    bool? handlePredicate, // 何时进入 handler
   }) {
     bool _isDebug = false;
     assert(_isDebug = true);
+    final bool _handlePredicate = handlePredicate ?? (!debugUpload && _isDebug);
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
@@ -165,6 +167,7 @@ class FlutterBugly {
       _filterAndUploadException(
         debugUpload,
         _isDebug,
+        _handlePredicate,
         handler,
         filterRegExp,
         FlutterErrorDetails(exception: error, stack: stackTrace),
@@ -184,6 +187,7 @@ class FlutterBugly {
   static void _filterAndUploadException(
     debugUpload,
     _isDebug,
+    handlePredicate,
     handler,
     filterRegExp,
     FlutterErrorDetails details,
@@ -191,6 +195,7 @@ class FlutterBugly {
     if (!_filterException(
       debugUpload,
       _isDebug,
+      handlePredicate,
       handler,
       filterRegExp,
       details,
@@ -204,19 +209,19 @@ class FlutterBugly {
   static bool _filterException(
     bool debugUpload,
     bool _isDebug,
+    bool handlePredicate,
     FlutterExceptionHandler? handler,
     String? filterRegExp,
     FlutterErrorDetails details,
   ) {
     // 默认 debug 下打印异常，不上传异常
-    if (!debugUpload && _isDebug) {
+    if (handlePredicate) {
       handler == null
           ? FlutterError.dumpErrorToConsole(details)
           : handler(details);
-      return true;
     }
     // 异常过滤
-    if (filterRegExp != null) {
+    if ((debugUpload || !_isDebug) && filterRegExp != null) {
       RegExp reg = new RegExp(filterRegExp);
       Iterable<Match> matches = reg.allMatches(details.exception.toString());
       if (matches.length > 0) {
