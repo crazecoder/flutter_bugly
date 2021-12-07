@@ -1,3 +1,9 @@
+## 0.4.0
+* (**破坏性改动**)：移除 `handler`，新增 `onException` 用于捕获全局异常。
+## 0.3.4
+* 优化 `postCatchedException` 断言
+* 导出 `InitResultInfo`
+* 代码结构优化
 ## 0.3.3
 * 升级 SDK 包 1.5.23
 * 修复布局越界时报Null check operator used on a null value的问题
