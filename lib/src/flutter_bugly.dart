@@ -133,17 +133,20 @@ class FlutterBugly {
     await _channel.invokeMethod('checkUpgrade', map);
   }
 
-  /// 异常上报
+  /// 异常上报。该方法等同于 [runZonedGuarded]。
+  ///
+  /// [callback] 运行的内容。
+  /// [onException] 自定义异常处理，可用于异常打印、双上报等定制逻辑。该字段不影响上报。
+  /// [filterRegExp] 针对 message 正则过滤异常上报。
+  /// [debugUpload] 是否在调试模式也上报。
   static void postCatchedException<T>(
     T callback(), {
-    FlutterExceptionHandler? handler, // 异常捕捉，用于自定义打印异常（处理后不再上报）
-    String? filterRegExp, // 异常上报过滤正则，针对 message
+    FlutterExceptionHandler? onException,
+    String? filterRegExp,
     bool debugUpload = false,
-    bool? handlePredicate, // 何时进入 handler
   }) {
     bool _isDebug = false;
     assert(_isDebug = true);
-    final bool _handlePredicate = handlePredicate ?? (!debugUpload && _isDebug);
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
@@ -167,8 +170,7 @@ class FlutterBugly {
       _filterAndUploadException(
         debugUpload,
         _isDebug,
-        _handlePredicate,
-        handler,
+        onException,
         filterRegExp,
         FlutterErrorDetails(exception: error, stack: stackTrace),
       );
@@ -187,7 +189,6 @@ class FlutterBugly {
   static void _filterAndUploadException(
     debugUpload,
     _isDebug,
-    handlePredicate,
     handler,
     filterRegExp,
     FlutterErrorDetails details,
@@ -195,7 +196,6 @@ class FlutterBugly {
     if (!_filterException(
       debugUpload,
       _isDebug,
-      handlePredicate,
       handler,
       filterRegExp,
       details,
@@ -209,18 +209,16 @@ class FlutterBugly {
   static bool _filterException(
     bool debugUpload,
     bool _isDebug,
-    bool handlePredicate,
     FlutterExceptionHandler? handler,
     String? filterRegExp,
     FlutterErrorDetails details,
   ) {
-    // 默认 debug 下打印异常，不上传异常
-    if (handlePredicate) {
-      handler == null
-          ? FlutterError.dumpErrorToConsole(details)
-          : handler(details);
+    if (handler != null) {
+      handler(details);
+    } else {
+      FlutterError.onError?.call(details);
     }
-    // 异常过滤
+    // 异常过滤。Debug 默认不上传异常。
     if ((debugUpload || !_isDebug) && filterRegExp != null) {
       RegExp reg = new RegExp(filterRegExp);
       Iterable<Match> matches = reg.allMatches(details.exception.toString());
