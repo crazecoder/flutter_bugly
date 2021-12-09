@@ -222,8 +222,12 @@ class FlutterBugly {
     } else {
       FlutterError.onError?.call(details);
     }
-    // 异常过滤。Debug 默认不上传异常。
-    if ((debugUpload || !_isDebug) && filterRegExp != null) {
+    // Debug 时默认不上传异常。
+    if (!debugUpload && _isDebug) {
+      return true;
+    }
+    // 异常过滤。
+    if (filterRegExp != null) {
       RegExp reg = new RegExp(filterRegExp);
       Iterable<Match> matches = reg.allMatches(details.exception.toString());
       if (matches.length > 0) {
