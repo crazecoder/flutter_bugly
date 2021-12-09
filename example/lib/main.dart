@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
       androidAppId: "your app id",
       iOSAppId: "your app id",
       customUpgrade: true, // 调用 Android 原生升级方式
+      canShowUpgradeActs: ['com.crazecoder.flutterbuglyexample.MainActivity']
     ).then((_result) {
       setState(() {
         _platformVersion = _result.message;

@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'bean/upgrade_info.dart';
+
 import 'bean/init_result_info.dart';
+import 'bean/upgrade_info.dart';
 
 class FlutterBugly {
   FlutterBugly._();
@@ -37,7 +38,9 @@ class FlutterBugly {
     int initDelay = 0, // 延迟初始化，单位秒
     int upgradeCheckPeriod = 0, //升级检查周期设置，单位秒
     int checkUpgradeCount = 1, // UpgradeInfo 为 null 时，再次 check 的次数，经测试 1 为最佳
-    bool customUpgrade = true, // 是否自定义升级，这里默认 true 为了兼容老版本
+    bool customUpgrade = true,
+    List<String>? canShowUpgradeActs, // 添加可显示弹窗的Activity
+    // 是否自定义升级，这里默认 true 为了兼容老版本
   }) async {
     assert(
       (Platform.isAndroid && androidAppId != null) ||
@@ -58,6 +61,7 @@ class FlutterBugly {
       "initDelay": initDelay,
       "upgradeCheckPeriod": upgradeCheckPeriod,
       "customUpgrade": customUpgrade,
+      if (canShowUpgradeActs != null) 'canShowUpgradeActs': canShowUpgradeActs,
     };
     final dynamic result = await _channel.invokeMethod('initBugly', map);
     Map resultMap = json.decode(result);
