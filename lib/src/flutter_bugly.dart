@@ -153,6 +153,15 @@ class FlutterBugly {
       var _stackTrace = isolateError.last;
       Zone.current.handleUncaughtError(_error, _stackTrace);
     }).sendPort);
+    // This captures errors reported by the Flutter framework.
+    FlutterError.onError = (details) {
+      if (details.stack != null) {
+        Zone.current.handleUncaughtError(details.exception, details.stack!);
+      } else {
+        FlutterError.presentError(details);
+      }
+    };
+    _postCaught = true;
     // This creates a [Zone] that contains the Flutter application and stablishes
     // an error handler that captures errors and reports them.
     //
@@ -175,15 +184,6 @@ class FlutterBugly {
         FlutterErrorDetails(exception: error, stack: stackTrace),
       );
     });
-    // This captures errors reported by the Flutter framework.
-    FlutterError.onError = (details) {
-      if (details.stack != null) {
-        Zone.current.handleUncaughtError(details.exception, details.stack!);
-      } else {
-        FlutterError.presentError(details);
-      }
-    };
-    _postCaught = true;
   }
 
   static void _filterAndUploadException(
