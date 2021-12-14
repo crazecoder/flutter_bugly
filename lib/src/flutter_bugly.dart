@@ -84,8 +84,11 @@ class FlutterBugly {
 
   /// 自定义渠道标识，Android 专用
   static Future<Null> setAppChannel(String channel) async {
-    Map<String, Object> map = {"channel": channel};
-    await _channel.invokeMethod('setAppChannel', map);
+    assert(Platform.isAndroid, 'setAppChannel only supports on Android.');
+    if (Platform.isAndroid) {
+      Map<String, Object> map = {"channel": channel};
+      await _channel.invokeMethod('setAppChannel', map);
+    }
   }
 
   /// 设置用户标识

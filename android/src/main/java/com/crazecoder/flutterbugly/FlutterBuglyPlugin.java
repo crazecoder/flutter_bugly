@@ -144,6 +144,12 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         } else if (call.method.equals("getUpgradeInfo")) {
             UpgradeInfo strategy = Beta.getUpgradeInfo();
             result(strategy);
+        } else if (call.method.equals("setAppChannel")) {
+            String channel = call.argument("channel");
+            if (!TextUtils.isEmpty(channel)) {
+                Bugly.setAppChannel(activity.getApplicationContext(), channel);
+            }
+            result(null);
         } else if (call.method.equals("postCatchedException")) {
             postException(call);
             result(null);
