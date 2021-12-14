@@ -1,3 +1,5 @@
+## 0.4.3
+* 修复 Android 端 `setAppChannel` 问题。
 ## 0.4.2
 * 优化 `postCatchedException` 内部方法执行顺序。
 ## 0.4.1
