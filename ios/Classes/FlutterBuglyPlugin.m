@@ -82,27 +82,8 @@
          if (level!=nil) {
             levelInteger = [level integerValue];
          }
-        switch(levelInteger){
-           case 5:
-                BLYLogVerbose(tag, log);
-              break;
-           case 4:
-                BLYLogDebug(tag, log);
-              break;
-           case 3:
-                BLYLogInfo(tag, log);
-              break;
-           case 2:
-                BLYLogWarn(tag, log);
-              break;
-           case 1:
-                BLYLogError(tag, log);
-              break;
-           default :
-                BLYLogDebug(tag, log);
-              break;
-        }
-         result(nil);
+        BLYLog(levelInteger, tag, log);
+        result(nil);
   }else {
       result(FlutterMethodNotImplemented);
   }
