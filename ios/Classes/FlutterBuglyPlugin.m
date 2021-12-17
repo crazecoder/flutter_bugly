@@ -1,5 +1,6 @@
 #import "FlutterBuglyPlugin.h"
 #import <Bugly/Bugly.h>
+#import "BuglyLog.h"
 
 @implementation FlutterBuglyPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -74,6 +75,41 @@
           [Bugly setUserValue:value forKey:key];
       }
       result(nil);
+  }else if([@"BuglyLog" isEqualToString:call.method]){///自定义日志
+         NSString *tag = call.arguments[@"tag"];
+         NSString *log = call.arguments[@"log"];
+         NSInteger levelInteger =0;
+         NSNumber *level = call.arguments[@"level"];
+         if (level!=nil) {
+            levelInteger = [level integerValue];
+         }
+         BuglyLogLevel level =BuglyLogLevel.;
+        switch(levelInteger){
+           case 5:
+              level = BuglyLogLevelVerbose;
+              break;
+           case 4:
+              level = BuglyLogLevelDebug;
+              break;
+           case 3:
+              level = BuglyLogLevelInfo;
+              break;
+           case 2:
+              level = BuglyLogLevelWarn;
+              break;
+           case 1:
+              level = BuglyLogLevelError;
+              break;
+           default :
+              level = BuglyLogLevelDebug;
+              break;
+        }
+
+
+         if (![self isBlankString:tag]&&![self isBlankString:log]){
+             [BuglyLog BLYLog:value forKey:key];
+         }
+         result(nil);
   }else {
       result(FlutterMethodNotImplemented);
   }

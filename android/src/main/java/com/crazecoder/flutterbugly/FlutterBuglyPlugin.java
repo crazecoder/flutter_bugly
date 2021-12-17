@@ -13,6 +13,7 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
+import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.HashMap;
@@ -152,6 +153,45 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
             result(null);
         } else if (call.method.equals("postCatchedException")) {
             postException(call);
+            result(null);
+        } else if (call.method.equals("BuglyLog")) {
+            String tag ="";
+            if (call.hasArgument("tag")) {
+                tag = call.argument("tag");
+            }
+            int level = 4;
+            if (call.hasArgument("level")) {
+                level = call.argument("level");
+            }
+            String log = "";
+            if (call.hasArgument("log")) {
+                log = call.argument("log");
+            }
+            int cache = 10;
+            if (call.hasArgument("cache")) {
+                cache = call.argument("cache");
+                BuglyLog.setCache(cache * 1024);
+            }
+            switch (level){
+                case 5:
+                    BuglyLog.v(tag, log);
+                    break;
+                case 4:
+                    BuglyLog.d(tag, log);
+                    break;
+                case 3:
+                    BuglyLog.i(tag, log);
+                    break;
+                case 2:
+                    BuglyLog.w(tag, log);
+                    break;
+                case 1:
+                    BuglyLog.e(tag, log);
+                    break;
+                default:
+                    BuglyLog.d(tag, log);
+                    break;
+            }
             result(null);
         } else {
             result.notImplemented();
