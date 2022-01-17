@@ -1,4 +1,4 @@
-name: flutter_bugly
+name: flutter_bugly_play
 description: Flutter plugin for Tencent Bugly, Crash monitoring, Crash analysis, exception reporting, application update, data statistics, etc
 version: 0.3.2+1
 author: crazecoder <21527312@qq.com>
