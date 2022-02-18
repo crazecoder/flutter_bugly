@@ -19,6 +19,26 @@ class UpgradeInfo extends BaseBean {
     this.updateType,
   });
 
+  factory UpgradeInfo.fromJson(Map<String, dynamic> json) {
+    return UpgradeInfo._(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      newFeature: json['newFeature'] ?? '',
+      publishTime: json['publishTime'] ?? 0,
+      publishType: json['publishType'] ?? 0,
+      upgradeType: json['upgradeType'] ?? 1,
+      popTimes: json['popTimes'] ?? 0,
+      popInterval: json['popInterval'] ?? 0,
+      versionCode: json['versionCode'],
+      versionName: json['versionName'] ?? '',
+      apkMd5: json['apkMd5'],
+      apkUrl: json['apkUrl'],
+      fileSize: json['fileSize'],
+      imageUrl: json['imageUrl'],
+      updateType: json['updateType'],
+    );
+  }
+
   final String id;
   final String title;
   final String newFeature;
@@ -34,26 +54,6 @@ class UpgradeInfo extends BaseBean {
   final int? fileSize;
   final String? imageUrl;
   final int? updateType;
-
-  factory UpgradeInfo.fromJson(Map<String, dynamic> json) {
-    return UpgradeInfo._(
-      id: json['id'] = '',
-      title: json['title'] = '',
-      newFeature: json['newFeature'] = '',
-      publishTime: json['publishTime'] = 0,
-      publishType: json['publishType'] = 0,
-      upgradeType: json['upgradeType'] = 1,
-      popTimes: json['popTimes'] = 0,
-      popInterval: json['popInterval'] = 0,
-      versionCode: json['versionCode'],
-      versionName: json['versionName'] = '',
-      apkMd5: json['apkMd5'],
-      apkUrl: json['apkUrl'],
-      fileSize: json['fileSize'],
-      imageUrl: json['imageUrl'],
-      updateType: json['updateType'],
-    );
-  }
 
   @override
   Map<String, dynamic> toJson() {
