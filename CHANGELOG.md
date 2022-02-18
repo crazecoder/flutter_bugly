@@ -1,3 +1,5 @@
+## 0.4.4
+* 修复 `UpgradeInfo` 序列化问题。
 ## 0.4.3
 * 修复 Android 端 `setAppChannel` 问题。
 ## 0.4.2
