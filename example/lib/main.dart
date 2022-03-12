@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bugly/flutter_bugly.dart';
@@ -29,27 +30,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     FlutterBugly.init(
-      androidAppId: "your app id",
-      iOSAppId: "your app id",
-      customUpgrade: true, // 调用 Android 原生升级方式
+      androidAppId: "0358f4a973",
+      iOSAppId: "0358f4a973",
     ).then((_result) {
       setState(() {
         _platformVersion = _result.message;
         print(_result.appId);
       });
     });
-    // 当配置 customUpgrade=true 时候，这里可以接收自定义升级
-    FlutterBugly.onCheckUpgrade.listen((_upgradeInfo) {
-      _showUpdateDialog(
-        _upgradeInfo.newFeature,
-        _upgradeInfo.apkUrl!,
-        _upgradeInfo.upgradeType == 2,
-      );
-    });
-    FlutterBugly.setUserId("user id");
-    FlutterBugly.putUserData(key: "key", value: "value");
-    int tag = 9527;
-    FlutterBugly.setUserTag(tag);
     // autoCheckUpgrade 为 true 时，可以不用调用
     // if (mounted) _checkUpgrade();
   }
@@ -60,18 +48,47 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Widget getItemView(String title, VoidCallback onPressed,
+      {bool visibility = true}) {
+    return Visibility(
+      visible: visibility,
+      child: RaisedButton(
+        child: new Text(title),
+        color: Color(0x66E6C8A0),
+        textColor: Colors.white,
+        onPressed: onPressed,
+        shape: RoundedRectangleBorder(
+            side: new BorderSide(color: Color(0xffE6C8A0), width: 1.0),
+            borderRadius: BorderRadius.circular(20.0)), //圆角大小
+      ),
+    );
+  }
+
+  Future<void> _log() async {
+    print("---- 打印日志 ----");
+    debugPrint("调试日志。。。。");
+    FlutterBugly.log("lock", "调试打印日志");
+
+    // var tt = int.parse("100fdaf");
+  }
+
+  Future<void> _upload() async {
+    print("---- 上报日志 ----");
+    FlutterBugly.uploadException(
+        message: "这个是一个日志。用来测试的 打印---${Random().nextInt(1000)}  日志",
+        detail: "我是用来测试ice ${Random().nextInt(1000)} ---- 2 我是detail");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bugly SDK')),
-      body: GestureDetector(
-        onTap: () {
-          if (Platform.isAndroid) {
-            _checkUpgrade();
-          }
-        },
-        child: Center(
-          child: Text('init result: $_platformVersion\n'),
+      body: Center(
+        child: Column(
+          children: [
+            getItemView("日志", _log, visibility: true),
+            getItemView("上报", _upload, visibility: true),
+          ],
         ),
       ),
     );

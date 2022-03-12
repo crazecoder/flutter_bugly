@@ -97,6 +97,12 @@ class FlutterBugly {
     await _channel.invokeMethod('setUserId', map);
   }
 
+  /// 上报日志
+  static Future<Null> log(String tag, String msg) async {
+    Map<String, Object> map = {"tag": tag, "msg": msg};
+    await _channel.invokeMethod('log', map);
+  }
+
   /// 设置标签
   /// [userTag] 标签 ID，可在网站生成
   static Future<Null> setUserTag(int userTag) async {

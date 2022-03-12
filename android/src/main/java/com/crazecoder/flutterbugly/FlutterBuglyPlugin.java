@@ -3,6 +3,7 @@ package com.crazecoder.flutterbugly;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -13,6 +14,7 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
+import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.HashMap;
@@ -100,7 +102,8 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                 Beta.canShowUpgradeActs.add(activity.getClass());
 
                 String appId = call.argument("appId").toString();
-                Bugly.init(activity.getApplicationContext(), appId, BuildConfig.DEBUG);
+//                Bugly.init(activity.getApplicationContext(), appId, true);
+                CrashReport.initCrashReport(activity.getApplicationContext(), appId, true);
                 if (call.hasArgument("channel")) {
                     String channel = call.argument("channel");
                     if (!TextUtils.isEmpty(channel))
@@ -152,6 +155,21 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
             result(null);
         } else if (call.method.equals("postCatchedException")) {
             postException(call);
+            result(null);
+        } else if (call.method.equals("log")) {
+            String tag = "bugly";
+            String msg = "msg";
+            if (call.hasArgument("tag")) {
+                tag = call.argument("tag");
+            }
+            if (call.hasArgument("msg")) {
+                msg = call.argument("msg");
+            }
+            BuglyLog.i(tag, msg + "-info");
+            BuglyLog.v(tag, msg + "-v");
+            BuglyLog.d(tag, msg + "-d");
+            BuglyLog.e(tag, msg + "-e");
+            Log.e(tag, "onMethodCall: ");
             result(null);
         } else {
             result.notImplemented();
@@ -223,6 +241,6 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
 
     @Override
     public void onDetachedFromActivity() {
-        
+
     }
 }
