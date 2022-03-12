@@ -47,13 +47,13 @@ class UpgradeInfo extends BaseBean {
   final int upgradeType;
   final int popTimes;
   final int popInterval;
-  final int? versionCode;
+  final int versionCode;
   final String versionName;
-  final String? apkMd5;
-  final String? apkUrl;
-  final int? fileSize;
-  final String? imageUrl;
-  final int? updateType;
+  final String apkMd5;
+  final String apkUrl;
+  final int fileSize;
+  final String imageUrl;
+  final int updateType;
 
   @override
   Map<String, dynamic> toJson() {

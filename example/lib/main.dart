@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
   /// Dio 可以监听下载进度，调用此方法
   void _updateProgress(_progress) {
     setState(() {
-      _dialogKey.currentState!.progress = _progress;
+      _dialogKey.currentState.progress = _progress;
     });
   }
 }

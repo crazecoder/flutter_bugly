@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class UpdateDialog extends StatefulWidget {
   final key;
   final version;
-  final Function? onClickWhenDownload;
-  final Function? onClickWhenNotDownload;
+  final Function onClickWhenDownload;
+  final Function onClickWhenNotDownload;
 
   UpdateDialog({
     this.key,
@@ -36,10 +36,10 @@ class UpdateDialogState extends State<UpdateDialog> {
           child: Text('更新', style: _textStyle),
           onPressed: () {
             if (_downloadProgress != 0.0) {
-              widget.onClickWhenDownload!("正在更新中");
+              widget.onClickWhenDownload("正在更新中");
               return;
             }
-            widget.onClickWhenNotDownload!();
+            widget.onClickWhenNotDownload();
           },
         ),
         TextButton(

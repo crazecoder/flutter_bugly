@@ -24,9 +24,9 @@ class FlutterBugly {
 
   /// 初始化
   static Future<InitResultInfo> init({
-    String? androidAppId,
-    String? iOSAppId,
-    String? channel, // 自定义渠道标识
+    String androidAppId,
+    String iOSAppId,
+    String channel, // 自定义渠道标识
     bool autoCheckUpgrade = true,
     bool autoInit = true,
     bool autoDownloadOnWifi = false,
@@ -46,7 +46,7 @@ class FlutterBugly {
     assert(_postCaught, 'Run postCatchedException first.');
     _channel.setMethodCallHandler(_handleMessages);
     _checkUpgradeCount = checkUpgradeCount;
-    Map<String, Object?> map = {
+    Map<String, Object> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "channel": channel,
       "autoCheckUpgrade": autoCheckUpgrade,
@@ -68,7 +68,7 @@ class FlutterBugly {
   static Future<Null> _handleMessages(MethodCall call) async {
     switch (call.method) {
       case 'onCheckUpgrade':
-        UpgradeInfo? _info = _decodeUpgradeInfo(call.arguments["upgradeInfo"]);
+        UpgradeInfo _info = _decodeUpgradeInfo(call.arguments["upgradeInfo"]);
         if (_info != null && _info.apkUrl != null) {
           _count = 0;
           _onCheckUpgrade.add(_info);
@@ -112,8 +112,8 @@ class FlutterBugly {
 
   ///设置关键数据，随崩溃信息上报
   static Future<Null> putUserData({
-    required String key,
-    required String value,
+      String key,
+      String value,
   }) async {
     assert(key.isNotEmpty);
     assert(value.isNotEmpty);
@@ -122,8 +122,8 @@ class FlutterBugly {
   }
 
   ///获取本地更新策略，即上次未更新的策略
-  static Future<UpgradeInfo?> getUpgradeInfo() async {
-    final String? result = await _channel.invokeMethod('getUpgradeInfo');
+  static Future<UpgradeInfo> getUpgradeInfo() async {
+    final String result = await _channel.invokeMethod('getUpgradeInfo');
     var info = _decodeUpgradeInfo(result);
     return info;
   }
@@ -150,8 +150,8 @@ class FlutterBugly {
   /// [debugUpload] 是否在调试模式也上报。
   static void postCatchedException<T>(
     T callback(), {
-    FlutterExceptionHandler? onException,
-    String? filterRegExp,
+    FlutterExceptionHandler onException,
+    String filterRegExp,
     bool debugUpload = false,
   }) {
     bool _isDebug = false;
@@ -165,7 +165,7 @@ class FlutterBugly {
     // This captures errors reported by the Flutter framework.
     FlutterError.onError = (details) {
       if (details.stack != null) {
-        Zone.current.handleUncaughtError(details.exception, details.stack!);
+        Zone.current.handleUncaughtError(details.exception, details.stack);
       } else {
         FlutterError.presentError(details);
       }
@@ -218,8 +218,8 @@ class FlutterBugly {
   static bool _filterException(
     bool debugUpload,
     bool _isDebug,
-    FlutterExceptionHandler? handler,
-    String? filterRegExp,
+    FlutterExceptionHandler handler,
+    String filterRegExp,
     FlutterErrorDetails details,
   ) {
     if (handler != null) {
@@ -246,9 +246,9 @@ class FlutterBugly {
   /// Android 错误分析 => 跟踪数据 => extraMessage.txt
   /// iOS 错误分析 => 跟踪数据 => crash_attach.log
   static Future<Null> uploadException({
-    required String message,
-    required String detail,
-    Map? data,
+    String message,
+    String detail,
+    Map data,
   }) async {
     var map = {};
     map.putIfAbsent("crash_message", () => message);
@@ -257,7 +257,7 @@ class FlutterBugly {
     await _channel.invokeMethod('postCatchedException', map);
   }
 
-  static UpgradeInfo? _decodeUpgradeInfo(String? jsonStr) {
+  static UpgradeInfo _decodeUpgradeInfo(String jsonStr) {
     if (jsonStr == null || jsonStr.isEmpty) return null;
     Map resultMap = json.decode(jsonStr);
     var info = UpgradeInfo.fromJson(resultMap as Map<String, dynamic>);
