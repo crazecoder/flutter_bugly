@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Plugin example app')),
+      appBar: AppBar(title: const Text('Bugly SDK')),
       body: GestureDetector(
         onTap: () {
           if (Platform.isAndroid) {
