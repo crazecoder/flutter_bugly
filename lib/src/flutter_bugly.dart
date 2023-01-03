@@ -265,4 +265,38 @@ class FlutterBugly {
     _onCheckUpgrade.close();
     _postCaught = false;
   }
+
+   ///自定义日志功能
+  ///用户传入TAG和日志内容。该日志将在Logcat输出，并在发生异常时上报。
+  ///使用BuglyLog接口时，为了减少磁盘IO次数，我们会先将日志缓存在内存中。当缓存大于一定阈值（默认10K），会将它持久化至文件
+  ///e:1 w:2 i:3 d:4 v:5
+  static Future<Null> buglyLog({
+    required String tag,
+    required String log,
+    int level =4,///默认debug
+    int? cache
+  }) async {
+    if(cache != null){
+      if(cache >30){//接口设置缓存大小，范围为0-30K
+        cache =30;
+      } else if(cache <0){//默认10K
+        cache =10;
+      }
+      Map<String, Object> map = {
+        "tag": tag,
+        "log": log,
+        "level":level,
+        "cache":cache
+      };
+      await _channel.invokeMethod('BuglyLog', map);
+    } else {
+      Map<String, Object> map = {
+        "tag": tag,
+        "log": log,
+        "level":level
+      };
+      await _channel.invokeMethod('BuglyLog', map);
+    }
+  }
+
 }

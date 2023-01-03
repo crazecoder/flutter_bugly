@@ -74,6 +74,16 @@
           [Bugly setUserValue:value forKey:key];
       }
       result(nil);
+  }else if([@"BuglyLog" isEqualToString:call.method]){///自定义日志
+         NSString *tag = call.arguments[@"tag"];
+         NSString *log = call.arguments[@"log"];
+         NSInteger levelInteger =4;
+         NSNumber *level = call.arguments[@"level"];
+         if (level!=nil) {
+            levelInteger = [level integerValue];
+         }
+        BLYLog(levelInteger, tag, log);
+        result(nil);
   }else {
       result(FlutterMethodNotImplemented);
   }
