@@ -16,11 +16,11 @@
       BOOL b = [self isBlankString:appId];
       if(!b){
           BuglyConfig * config = [[BuglyConfig alloc] init];
-          NSString *channel = call.arguments[@"channel"];
-          BOOL isChannelEmpty = [self isBlankString:channel];
-          if(!isChannelEmpty){
-            config.channel = channel;
-          }
+          [self setChannel:call config:config];
+          [self unexpectedTerminatingDetectionEnable:call config:config];
+          [self blockMonitorEnable:call config:config];
+          [self debugMode:call config:config];
+          [self symbolicateInProcessEnable:call config:config];
           [Bugly startWithAppId:appId config:config];
           NSLog(@"Bugly appId: %@", appId);
 
@@ -78,6 +78,57 @@
       result(FlutterMethodNotImplemented);
   }
 }
+
+- (void) setChannel:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    NSString *channel = call.arguments[@"channel"];
+    BOOL isChannelEmpty = [self isBlankString:channel];
+    if(!isChannelEmpty){
+      config.channel = channel;
+    }
+}
+
+- (void) setAppVersion:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    NSString *appVersion = call.arguments[@"appVersion"];
+    BOOL isAppVersionEmpty = [self isBlankString:appVersion];
+    if(!isAppVersionEmpty){
+      config.version = appVersion;
+    }
+}
+
+- (void) setDeviceId:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    NSString *deviceId = call.arguments[@"deviceId"];
+    BOOL isDeviceIdEmpty = [self isBlankString:deviceId];
+    if(!isDeviceIdEmpty){
+      config.deviceIdentifier = deviceId;
+    }
+}
+
+- (void) setBlockMonitorTimeout:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    NSNumber *blockMonitorTimeoutNumber = call.arguments[@"blockMonitorTimeout"];
+    double blockMonitorTimeout = [blockMonitorTimeoutNumber doubleValue];
+    config.blockMonitorTimeout = blockMonitorTimeout;
+}
+
+- (void) unexpectedTerminatingDetectionEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    BOOL unexpectedTerminatingDetectionEnable = call.arguments[@"unexpectedTerminatingDetectionEnable"];
+    config.unexpectedTerminatingDetectionEnable = unexpectedTerminatingDetectionEnable;
+}
+
+- (void) blockMonitorEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    BOOL blockMonitorEnable = call.arguments[@"blockMonitorEnable"];
+    config.blockMonitorEnable = blockMonitorEnable;
+}
+
+- (void) debugMode:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    BOOL debugMode = call.arguments[@"debugMode"];
+    config.debugMode = debugMode;
+}
+
+- (void) symbolicateInProcessEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    BOOL symbolicateInProcessEnable = call.arguments[@"symbolicateInProcessEnable"];
+    config.symbolicateInProcessEnable = symbolicateInProcessEnable;
+}
+
 - (BOOL) isBlankString:(NSString *)string {
     if (string == nil || string == NULL) {
         return YES;

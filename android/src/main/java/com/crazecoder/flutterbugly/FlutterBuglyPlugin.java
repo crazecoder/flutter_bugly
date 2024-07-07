@@ -9,14 +9,7 @@ import androidx.annotation.NonNull;
 import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
 import com.crazecoder.flutterbugly.utils.JsonUtil;
 import com.crazecoder.flutterbugly.utils.MapUtil;
-import com.tencent.bugly.Bugly;
-import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.beta.UpgradeInfo;
-import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.crashreport.CrashReport;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import io.flutter.BuildConfig;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -26,7 +19,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * FlutterBuglyPlugin
@@ -40,72 +32,37 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
     private FlutterPluginBinding flutterPluginBinding;
 
 
-    /**
-     * Plugin registration.
-     */
-    public static void registerWith(Registrar registrar) {
-        channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_bugly");
-        FlutterBuglyPlugin plugin = new FlutterBuglyPlugin();
-        channel.setMethodCallHandler(plugin);
-        activity = registrar.activity();
-    }
-
     @Override
     public void onMethodCall(final MethodCall call, @NonNull final Result result) {
         isResultSubmitted = false;
         this.result = result;
         if (call.method.equals("initBugly")) {
             if (call.hasArgument("appId")) {
-                if (call.hasArgument("autoInit")) {
-                    Beta.autoInit = false;
-                }
-                if (call.hasArgument("enableHotfix")) {
-                    Beta.enableHotfix = call.argument("enableHotfix");
-                }
-                if (call.hasArgument("autoCheckUpgrade")) {
-                    Beta.autoCheckUpgrade = call.argument("autoCheckUpgrade");
-                }
-                if (call.hasArgument("autoDownloadOnWifi")) {
-                    Beta.autoDownloadOnWifi = call.argument("autoDownloadOnWifi");
-                }
-                if (call.hasArgument("initDelay")) {
-                    int delay = call.argument("initDelay");
-                    Beta.initDelay = delay * 1000;
-                }
-                if (call.hasArgument("enableNotification")) {
-                    Beta.enableNotification = call.argument("enableNotification");
-                }
-                if (call.hasArgument("upgradeCheckPeriod")) {
-                    int period = call.argument("upgradeCheckPeriod");
-                    Beta.upgradeCheckPeriod = period * 1000;
-                }
-                if (call.hasArgument("showInterruptedStrategy")) {
-                    Beta.showInterruptedStrategy = call.argument("showInterruptedStrategy");
-                }
-                if (call.hasArgument("canShowApkInfo")) {
-                    Beta.canShowApkInfo = call.argument("canShowApkInfo");
-                }
-                if (call.hasArgument("customUpgrade")) {
-                    boolean customUpgrade = call.argument("customUpgrade");
-                    /*在application中初始化时设置监听，监听策略的收取*/
-                    Beta.upgradeListener = customUpgrade ? new UpgradeListener() {
-                        @Override
-                        public void onUpgrade(int ret, UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                            Map<String, Object> data = new HashMap<>();
-                            data.put("upgradeInfo", JsonUtil.toJson(MapUtil.deepToMap(strategy)));
-                            channel.invokeMethod("onCheckUpgrade", data);
-                        }
-                    } : null;
-                }
-                Beta.canShowUpgradeActs.add(activity.getClass());
-
                 String appId = call.argument("appId").toString();
-                Bugly.init(activity.getApplicationContext(), appId, BuildConfig.DEBUG);
-                if (call.hasArgument("channel")) {
-                    String channel = call.argument("channel");
-                    if (!TextUtils.isEmpty(channel))
-                        Bugly.setAppChannel(activity.getApplicationContext(), channel);
+                CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(activity);
+                setChannel(call, strategy);
+                setDeviceID(call, strategy);
+                setDeviceModel(call, strategy);
+                setAppVersion(call, strategy);
+                setAppPackageName(call, strategy);
+
+                //设置Bugly初始化延迟
+                if (call.hasArgument("initDelay")) {
+                    long delay = Long.parseLong(call.argument("initDelay").toString());
+                    strategy.setAppReportDelay(delay);
                 }
+                //设置anr时是否获取系统trace文件，默认为false
+                if (call.hasArgument("enableCatchAnrTrace")) {
+                    boolean enableCatchAnrTrace = call.argument("enableCatchAnrTrace");
+                    strategy.setEnableCatchAnrTrace(enableCatchAnrTrace);
+                }
+                //设置是否获取anr过程中的主线程堆栈，默认为true
+                if (call.hasArgument("enableRecordAnrMainStack")) {
+                    boolean enableRecordAnrMainStack = call.argument("enableRecordAnrMainStack");
+                    strategy.setEnableRecordAnrMainStack(enableRecordAnrMainStack);
+                }
+                CrashReport.initCrashReport(activity.getApplicationContext(), appId, BuildConfig.DEBUG);
+
                 result(getResultBean(true, appId, "Bugly 初始化成功"));
             } else {
                 result(getResultBean(false, null, "Bugly appId不能为空"));
@@ -113,41 +70,36 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         } else if (call.method.equals("setUserId")) {
             if (call.hasArgument("userId")) {
                 String userId = call.argument("userId");
-                Bugly.setUserId(activity.getApplicationContext(), userId);
+                CrashReport.setUserId(activity.getApplicationContext(), userId);
             }
             result(null);
         } else if (call.method.equals("setUserTag")) {
             if (call.hasArgument("userTag")) {
-                Integer userTag = call.argument("userTag");
-                if (userTag != null)
-                    Bugly.setUserTag(activity.getApplicationContext(), userTag);
+                Integer userSceneTag = call.argument("userTag");
+                if (userSceneTag != null)
+                    CrashReport.setUserSceneTag(activity.getApplicationContext(), userSceneTag);
             }
+            result(null);
+        } else if (call.method.equals("setChannel")) {
+            setChannel(call, null);
+            result(null);
+        } else if (call.method.equals("setDeviceID")) {
+            setDeviceID(call, null);
+            result(null);
+        } else if (call.method.equals("setDeviceModel")) {
+            setDeviceModel(call, null);
+            result(null);
+        } else if (call.method.equals("setAppVersion")) {
+            setAppVersion(call, null);
+            result(null);
+        } else if (call.method.equals("setAppPackageName")) {
+            setAppPackageName(call, null);
             result(null);
         } else if (call.method.equals("putUserData")) {
             if (call.hasArgument("key") && call.hasArgument("value")) {
                 String userDataKey = call.argument("key");
                 String userDataValue = call.argument("value");
-                Bugly.putUserData(activity.getApplicationContext(), userDataKey, userDataValue);
-            }
-            result(null);
-        } else if (call.method.equals("checkUpgrade")) {
-            boolean isManual = false;
-            boolean isSilence = false;
-            if (call.hasArgument("isManual")) {
-                isManual = call.argument("isManual");
-            }
-            if (call.hasArgument("isSilence")) {
-                isSilence = call.argument("isSilence");
-            }
-            Beta.checkUpgrade(isManual, isSilence);
-            result(null);
-        } else if (call.method.equals("getUpgradeInfo")) {
-            UpgradeInfo strategy = Beta.getUpgradeInfo();
-            result(strategy);
-        } else if (call.method.equals("setAppChannel")) {
-            String channel = call.argument("channel");
-            if (!TextUtils.isEmpty(channel)) {
-                Bugly.setAppChannel(activity.getApplicationContext(), channel);
+                CrashReport.putUserData(activity.getApplicationContext(), userDataKey, userDataValue);
             }
             result(null);
         } else if (call.method.equals("postCatchedException")) {
@@ -158,6 +110,90 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
             isResultSubmitted = true;
         }
 
+    }
+
+    /**
+     * 配置APP渠道号
+     */
+    private void setChannel(final MethodCall call, CrashReport.UserStrategy strategy) {
+        if (call.hasArgument("channel")) {
+            String channel = call.argument("channel");
+            if (!TextUtils.isEmpty(channel)) {
+                if (strategy == null) {
+                    CrashReport.setAppChannel(activity.getApplicationContext(), channel);
+                } else {
+                    strategy.setAppChannel(channel);
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置设备id
+     */
+    private void setDeviceID(final MethodCall call, CrashReport.UserStrategy strategy) {
+        if (call.hasArgument("deviceId")) {
+            String deviceId = call.argument("deviceId");
+            if (!TextUtils.isEmpty(deviceId)) {
+                if (strategy == null) {
+                    CrashReport.setDeviceId(activity.getApplicationContext(), deviceId);
+                } else {
+                    strategy.setDeviceID(deviceId);
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置设备型号
+     */
+    private void setDeviceModel(final MethodCall call, CrashReport.UserStrategy strategy) {
+        if (call.hasArgument("deviceModel")) {
+            String deviceModel = call.argument("deviceModel");
+            if (!TextUtils.isEmpty(deviceModel)) {
+                if (strategy == null) {
+                    CrashReport.setDeviceModel(activity.getApplicationContext(), deviceModel);
+                } else {
+                    strategy.setDeviceModel(deviceModel);
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置App版本
+     *
+     * @param call
+     */
+    private void setAppVersion(final MethodCall call, CrashReport.UserStrategy strategy) {
+        if (call.hasArgument("appVersion")) {
+            String appVersion = call.argument("appVersion");
+            if (!TextUtils.isEmpty(appVersion)) {
+                if (strategy == null) {
+                    CrashReport.setAppVersion(activity.getApplicationContext(), appVersion);
+                } else {
+                    strategy.setAppVersion(appVersion);
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置App包名
+     *
+     * @param call
+     */
+    private void setAppPackageName(final MethodCall call, CrashReport.UserStrategy strategy) {
+        if (call.hasArgument("appPackage")) {
+            String appPackage = call.argument("appPackage");
+            if (!TextUtils.isEmpty(appPackage)) {
+                if (strategy == null) {
+                    CrashReport.setAppPackage(activity.getApplicationContext(), appPackage);
+                } else {
+                    strategy.setAppPackageName(appPackage);
+                }
+            }
+        }
     }
 
     private void postException(MethodCall call) {
@@ -207,7 +243,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         activity = binding.getActivity();
-        channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "crazecoder/flutter_bugly");
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "crazecoder/flutter_bugly");
         channel.setMethodCallHandler(this);
     }
 
@@ -223,6 +259,6 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
 
     @Override
     public void onDetachedFromActivity() {
-        
+
     }
 }

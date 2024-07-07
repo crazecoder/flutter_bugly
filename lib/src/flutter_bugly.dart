@@ -5,7 +5,6 @@ import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
-import 'bean/upgrade_info.dart';
 import 'bean/init_result_info.dart';
 
 class FlutterBugly {
@@ -15,11 +14,6 @@ class FlutterBugly {
     'crazecoder/flutter_bugly',
   );
 
-  static final StreamController<UpgradeInfo> _onCheckUpgrade =
-      StreamController<UpgradeInfo>.broadcast();
-
-  static int _checkUpgradeCount = 0;
-  static int _count = 0;
   static bool _postCaught = false;
 
   /// 初始化
@@ -27,68 +21,52 @@ class FlutterBugly {
     String? androidAppId,
     String? iOSAppId,
     String? channel, // 自定义渠道标识
-    bool autoCheckUpgrade = true,
-    bool autoInit = true,
-    bool autoDownloadOnWifi = false,
-    bool enableHotfix = false,
-    bool enableNotification = false, // 未适配 androidx
-    bool showInterruptedStrategy = true, // 设置开启显示打断策略
-    bool canShowApkInfo = true, // 设置是否显示弹窗中的 apk 信息
+    String? deviceId, // 设备id
+    String? appVersion, // App版本
+    String? userId, // 用户标识
+    //android
     int initDelay = 0, // 延迟初始化，单位秒
-    int upgradeCheckPeriod = 0, //升级检查周期设置，单位秒
-    int checkUpgradeCount = 1, // UpgradeInfo 为 null 时，再次 check 的次数，经测试 1 为最佳
-    bool customUpgrade = true, // 是否自定义升级，这里默认 true 为了兼容老版本
+    String? deviceModel, // 设备型号
+    String? appPackage, // App包名
+    bool enableCatchAnrTrace = false, //设置anr时是否获取系统trace文件，默认为false
+    bool enableRecordAnrMainStack = true, //设置是否获取anr过程中的主线程堆栈，默认为true
+    //iOS
+    double blockMonitorTimeout = 3, //卡顿阀值
+    bool unexpectedTerminatingDetectionEnable = true, //非正常退出事件(SIGKILL)
+    bool enableBlockMonitor = true, //卡顿监控
+    bool debugMode = false, //开启SDK日志
+    bool symbolicateInProcessEnable = true, //进程内还原符号
   }) async {
     assert(
       (Platform.isAndroid && androidAppId != null) ||
           (Platform.isIOS && iOSAppId != null),
     );
+    assert(debugMode = true);
     assert(_postCaught, 'Run postCatchedException first.');
-    _channel.setMethodCallHandler(_handleMessages);
-    _checkUpgradeCount = checkUpgradeCount;
     Map<String, Object?> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "channel": channel,
-      "autoCheckUpgrade": autoCheckUpgrade,
-      "autoDownloadOnWifi": autoDownloadOnWifi,
-      "enableHotfix": enableHotfix,
-      "enableNotification": enableNotification,
-      "showInterruptedStrategy": showInterruptedStrategy,
-      "canShowApkInfo": canShowApkInfo,
+      "deviceId": deviceId,
+      "appVersion": appVersion,
+      "userId": userId,
+      //android
+      "deviceModel": deviceModel,
       "initDelay": initDelay,
-      "upgradeCheckPeriod": upgradeCheckPeriod,
-      "customUpgrade": customUpgrade,
+      "appPackage": appPackage,
+      "enableCatchAnrTrace": enableCatchAnrTrace,
+      "enableRecordAnrMainStack": enableRecordAnrMainStack,
+      //iOS
+      "blockMonitorTimeout": blockMonitorTimeout,
+      "unexpectedTerminatingDetectionEnable":
+          unexpectedTerminatingDetectionEnable,
+      "enableBlockMonitor": enableBlockMonitor,
+      "debugMode": debugMode,
+      "symbolicateInProcessEnable": symbolicateInProcessEnable,
     };
     final dynamic result = await _channel.invokeMethod('initBugly', map);
     Map resultMap = json.decode(result);
     var resultBean = InitResultInfo.fromJson(resultMap as Map<String, dynamic>);
     return resultBean;
-  }
-
-  static Future<Null> _handleMessages(MethodCall call) async {
-    switch (call.method) {
-      case 'onCheckUpgrade':
-        UpgradeInfo? _info = _decodeUpgradeInfo(call.arguments["upgradeInfo"]);
-        if (_info != null && _info.apkUrl != null) {
-          _count = 0;
-          _onCheckUpgrade.add(_info);
-        } else {
-          if (_count < _checkUpgradeCount) {
-            _count++;
-            checkUpgrade(isManual: false);
-          }
-        }
-        break;
-    }
-  }
-
-  /// 自定义渠道标识，Android 专用
-  static Future<Null> setAppChannel(String channel) async {
-    assert(Platform.isAndroid, 'setAppChannel only supports on Android.');
-    if (Platform.isAndroid) {
-      Map<String, Object> map = {"channel": channel};
-      await _channel.invokeMethod('setAppChannel', map);
-    }
   }
 
   /// 设置用户标识
@@ -98,9 +76,9 @@ class FlutterBugly {
   }
 
   /// 设置标签
-  /// [userTag] 标签 ID，可在网站生成
-  static Future<Null> setUserTag(int userTag) async {
-    Map<String, Object> map = {"userTag": userTag};
+  /// [userSceneTag] 标签 ID，可在网站生成
+  static Future<Null> setUserTag(int userSceneTag) async {
+    Map<String, Object> map = {"userTag": userSceneTag};
     await _channel.invokeMethod('setUserTag', map);
   }
 
@@ -113,27 +91,6 @@ class FlutterBugly {
     assert(value.isNotEmpty);
     Map<String, Object> map = {"key": key, "value": value};
     await _channel.invokeMethod('putUserData', map);
-  }
-
-  ///获取本地更新策略，即上次未更新的策略
-  static Future<UpgradeInfo?> getUpgradeInfo() async {
-    final String? result = await _channel.invokeMethod('getUpgradeInfo');
-    var info = _decodeUpgradeInfo(result);
-    return info;
-  }
-
-  /// 检查更新，返回更新策略信息
-  static Future<Null> checkUpgrade({
-    bool isManual = true,
-    bool isSilence = false,
-  }) async {
-    if (!Platform.isAndroid) return null;
-    if (isManual) _count = 0;
-    Map<String, Object> map = {
-      "isManual": isManual, // 用户手动点击检查，非用户点击操作请传 false
-      "isSilence": isSilence, // 是否显示弹窗等交互，[true:没有弹窗和toast] [false:有弹窗或toast]
-    };
-    await _channel.invokeMethod('checkUpgrade', map);
   }
 
   /// 异常上报。该方法等同于 [runZonedGuarded]。
@@ -251,18 +208,37 @@ class FlutterBugly {
     await _channel.invokeMethod('postCatchedException', map);
   }
 
-  static UpgradeInfo? _decodeUpgradeInfo(String? jsonStr) {
-    if (jsonStr == null || jsonStr.isEmpty) return null;
-    Map resultMap = json.decode(jsonStr);
-    var info = UpgradeInfo.fromJson(resultMap as Map<String, dynamic>);
-    return info;
+  /// 自定义渠道标识 ,单独设置方法仅android可用
+  static Future<Null> setAppChannel(String channel) async {
+    Map<String, Object> map = {"channel": channel};
+    await _channel.invokeMethod('setAppChannel', map);
   }
 
-  static Stream<UpgradeInfo> get onCheckUpgrade => _onCheckUpgrade.stream;
+  /// 设置设备型号 ,单独设置方法仅android可用
+  static Future<Null> setDeviceModel(String deviceModel) async {
+    Map<String, Object> map = {"deviceModel": deviceModel};
+    await _channel.invokeMethod('setDeviceModel', map);
+  }
+  
+  /// 设置App包名 ,单独设置方法仅android可用
+  static Future<Null> setAppPackageName(String appPackage) async {
+    Map<String, Object> map = {"appPackage": appPackage};
+    await _channel.invokeMethod('setAppPackageName', map);
+  }
+
+  /// 设置App版本 ,单独设置方法仅android可用
+  static Future<Null> setAppVersion(String appVersion) async {
+    Map<String, Object> map = {"appVersion": appVersion};
+    await _channel.invokeMethod('setAppVersion', map);
+  }
+
+  /// 设置设备id ,单独设置方法仅android可用
+  static Future<Null> setDeviceID(String deviceId) async {
+    Map<String, Object> map = {"deviceId": deviceId};
+    await _channel.invokeMethod('setDeviceID', map);
+  }
 
   static void dispose() {
-    _count = 0;
-    _onCheckUpgrade.close();
     _postCaught = false;
   }
 }

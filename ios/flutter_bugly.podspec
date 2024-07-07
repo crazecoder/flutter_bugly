@@ -17,6 +17,7 @@ A new Flutter bugly plugin.
   s.dependency 'Flutter'
   s.dependency 'Bugly'
   s.static_framework = true
+  # s.pods_target_xcconfig = {'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulators*]' => 'x86_64'}
 
   s.ios.deployment_target = '8.0'
 end

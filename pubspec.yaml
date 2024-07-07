@@ -1,12 +1,11 @@
 name: flutter_bugly
 description: Flutter plugin for Tencent Bugly, Crash monitoring, Crash analysis, exception reporting, application update, data statistics, etc
-version: 0.4.4
+version: 1.0.0
 homepage: https://github.com/crazecoder/flutter_bugly
 # author: crazecoder <21527312@qq.com>
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
-  flutter: '>=2.0.0'
+  sdk: '>=3.1.2 <4.0.0'
 
 dependencies:
   flutter:
