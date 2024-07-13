@@ -17,6 +17,7 @@
       if(!b){
           BuglyConfig * config = [[BuglyConfig alloc] init];
           [self setChannel:call config:config];
+          [self setAppVersion:call config:config];
           [self unexpectedTerminatingDetectionEnable:call config:config];
           [self blockMonitorEnable:call config:config];
           [self debugMode:call config:config];
@@ -65,6 +66,12 @@
       if (userTag!=nil) {
           NSInteger anInteger = [userTag integerValue];
           [Bugly setTag:anInteger];
+      }
+      result(nil);
+  }else if([@"setAppVersion" isEqualToString:call.method]){
+      NSString *appVersion = call.arguments[@"appVersion"];
+      if (![self isBlankString:appVersion]) {
+          [Bugly updateAppVersion:appVersion];
       }
       result(nil);
   }else if([@"putUserData" isEqualToString:call.method]){
