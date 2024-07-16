@@ -17,6 +17,7 @@
       if(!b){
           BuglyConfig * config = [[BuglyConfig alloc] init];
           [self setChannel:call config:config];
+          [self setAppVersion:call config:config];
           [self unexpectedTerminatingDetectionEnable:call config:config];
           [self blockMonitorEnable:call config:config];
           [self debugMode:call config:config];
@@ -67,6 +68,12 @@
           [Bugly setTag:anInteger];
       }
       result(nil);
+  }else if([@"setAppVersion" isEqualToString:call.method]){
+      NSString *appVersion = call.arguments[@"appVersion"];
+      if (![self isBlankString:appVersion]) {
+          [Bugly updateAppVersion:appVersion];
+      }
+      result(nil);
   }else if([@"putUserData" isEqualToString:call.method]){
       NSString *key = call.arguments[@"key"];
       NSString *value = call.arguments[@"value"];
@@ -110,22 +117,22 @@
 }
 
 - (void) unexpectedTerminatingDetectionEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
-    BOOL unexpectedTerminatingDetectionEnable = call.arguments[@"unexpectedTerminatingDetectionEnable"];
+    BOOL unexpectedTerminatingDetectionEnable = [call.arguments[@"unexpectedTerminatingDetectionEnable"] boolValue];
     config.unexpectedTerminatingDetectionEnable = unexpectedTerminatingDetectionEnable;
 }
 
 - (void) blockMonitorEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
-    BOOL blockMonitorEnable = call.arguments[@"blockMonitorEnable"];
+    BOOL blockMonitorEnable = [call.arguments[@"blockMonitorEnable"] boolValue];
     config.blockMonitorEnable = blockMonitorEnable;
 }
 
 - (void) debugMode:(FlutterMethodCall*)call config:(BuglyConfig*) config{
-    BOOL debugMode = call.arguments[@"debugMode"];
+    BOOL debugMode = [call.arguments[@"debugMode"] boolValue];
     config.debugMode = debugMode;
 }
 
 - (void) symbolicateInProcessEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
-    BOOL symbolicateInProcessEnable = call.arguments[@"symbolicateInProcessEnable"];
+    BOOL symbolicateInProcessEnable = [call.arguments[@"symbolicateInProcessEnable"] boolValue];
     config.symbolicateInProcessEnable = symbolicateInProcessEnable;
 }
 
