@@ -15,7 +15,7 @@ A new Flutter bugly plugin.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'Bugly'
+  s.dependency 'Bugly', '2.6.1'
   s.static_framework = true
   # s.pods_target_xcconfig = {'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulators*]' => 'x86_64'}
 

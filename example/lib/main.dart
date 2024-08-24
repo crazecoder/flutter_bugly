@@ -1,7 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bugly/flutter_bugly.dart';
+
+import '../../lib/flutter_bugly.dart';
 
 
 void main() => FlutterBugly.postCatchedException(() => runApp(MyApp()));
@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
     FlutterBugly.putUserData(key: "key", value: "value");
     int tag = 9527;
     FlutterBugly.setUserTag(tag);
+    FlutterBugly.setAppVersion('app version');
     // autoCheckUpgrade 为 true 时，可以不用调用
     // if (mounted) _checkUpgrade();
   }

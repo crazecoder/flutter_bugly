@@ -226,7 +226,7 @@ class FlutterBugly {
     await _channel.invokeMethod('setAppPackageName', map);
   }
 
-  /// 设置App版本 ,单独设置方法仅android可用
+  /// 设置App版本
   static Future<Null> setAppVersion(String appVersion) async {
     Map<String, Object> map = {"appVersion": appVersion};
     await _channel.invokeMethod('setAppVersion', map);
