@@ -25,12 +25,13 @@ android {
     compileSdk 34
     
     if (project.android.hasProperty('namespace')) {
-        namespace "com.crazecoder.openfile"
+        namespace "com.crazecoder.flutterbugly"
     }
 
     defaultConfig {
-        minSdk 16
+        minSdk 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'proguard-rules.pro'
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -39,5 +40,4 @@ android {
 
 dependencies {
     implementation 'com.tencent.bugly:crashreport:4.1.9.3'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
