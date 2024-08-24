@@ -4,54 +4,39 @@ version '1.0-SNAPSHOT'
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:7.3.1'
     }
 }
 
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 apply plugin: 'com.android.library'
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
 android {
-    compileSdkVersion 28
+    compileSdk 34
+    
+    if (project.android.hasProperty('namespace')) {
+        namespace "com.crazecoder.openfile"
+    }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdk 16
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'proguard-rules.pro'
-
     }
     lintOptions {
         disable 'InvalidPackage'
     }
-    buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 }
+
 dependencies {
     implementation 'com.tencent.bugly:crashreport:4.1.9.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
