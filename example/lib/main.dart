@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bugly/flutter_bugly.dart';
 
-import '../../lib/flutter_bugly.dart';
 
 
 void main() => FlutterBugly.postCatchedException(() => runApp(MyApp()));
