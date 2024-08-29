@@ -63,6 +63,14 @@ void main() {
       iOSAppId: "your iOS app id",
     );
   });
+
+  //如果报错 Zone mismatch.使用下面的方法
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    runApp(MyApp());
+  }, (exception, stackTrace) async {
+    FlutterBugly.uploadException(message: exception.toString(),detail: stackTrace.toString());
+  });
 }
 ```
 
