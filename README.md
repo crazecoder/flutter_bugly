@@ -1,7 +1,7 @@
 # flutter_bugly
 [![Bugly package](https://img.shields.io/pub/v/flutter_bugly.svg)](https://pub.dev/packages/flutter_bugly)
 [![Bugly Play package](https://img.shields.io/pub/v/flutter_bugly_play?label=bugly_play)](https://pub.dev/packages/flutter_bugly)
-[![Gitter](https://badges.gitter.im/flutter_developer/community.svg)](https://gitter.im/flutter_developer/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Discord](https://img.shields.io/badge/discord-FlutterDev-blue.svg)](https://discord.gg/q6yFDws3Xc)
 
 腾讯 Bugly 插件，支持Android/iOS 运营统计、原生异常上报、flutter 异常上报。
 
