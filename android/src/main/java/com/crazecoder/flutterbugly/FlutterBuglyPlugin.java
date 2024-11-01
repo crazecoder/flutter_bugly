@@ -80,7 +80,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                     CrashReport.setUserSceneTag(activity.getApplicationContext(), userSceneTag);
             }
             result(null);
-        } else if (call.method.equals("setChannel")) {
+        } else if (call.method.equals("setAppChannel")) {
             setChannel(call, null);
             result(null);
         } else if (call.method.equals("setDeviceID")) {
