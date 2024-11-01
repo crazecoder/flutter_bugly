@@ -1,3 +1,8 @@
+## 1.0.3
+* fix [#165](https://github.com/crazecoder/flutter_bugly/issues/165)
+## 1.0.2
+* 修复namespace
+* 删除多余引用库
 ## 1.0.1
 * 新增iOS支持初始化配置App版本号、支持更新App版本号
 * 修复iOS初始化SDK时BOOL值不生效问题
