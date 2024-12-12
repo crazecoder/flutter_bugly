@@ -69,7 +69,11 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     runApp(MyApp());
   }, (exception, stackTrace) async {
-    FlutterBugly.uploadException(message: exception.toString(),detail: stackTrace.toString());
+    FlutterBugly.uploadException(
+      type: exception.runtimeType.toString(),
+      message: exception.toString(),
+      detail: stackTrace.toString(),
+    );
   });
 }
 ```

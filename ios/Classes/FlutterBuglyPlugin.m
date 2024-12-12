@@ -39,13 +39,14 @@
       }
       
   }else if([@"postCatchedException" isEqualToString:call.method]){
+      NSString *crash_type = call.arguments[@"crash_type"];
       NSString *crash_detail = call.arguments[@"crash_detail"];
       NSString *crash_message = call.arguments[@"crash_message"];
-      if (crash_detail == nil || crash_detail == NULL) {
-         crash_message = @"";
-      }
-      if ([crash_detail isKindOfClass:[NSNull class]]) {
+      if ([self isBlankString:crash_detail]) {
           crash_message = @"";
+      }
+      if ([self isBlankString:crash_type]) {
+          crash_type = crash_message;
       }
       NSArray *stackTraceArray = [crash_detail componentsSeparatedByString:@""];
       NSDictionary *data = call.arguments[@"crash_data"];
@@ -53,7 +54,7 @@
         data = [NSMutableDictionary dictionary];
       }
 
-      [Bugly reportExceptionWithCategory:5 name:crash_message reason:@" " callStack:stackTraceArray extraInfo:data terminateApp:NO];
+      [Bugly reportExceptionWithCategory:5 name:crash_type reason:crash_message callStack:stackTraceArray extraInfo:data terminateApp:NO];
       result(nil);
   }else if([@"setUserId" isEqualToString:call.method]){
       NSString *userId = call.arguments[@"userId"];

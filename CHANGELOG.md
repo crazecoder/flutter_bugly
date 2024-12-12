@@ -1,3 +1,8 @@
+## 1.0.4
+* uploadException方法新增type参数，推荐传exception.runtimeType.toString()，不传默认取message内容
+* [Android] 生效debugMode参数
+* [Android] uploadException方法data参数生效
+* [Android] 初始化时strategy配置生效
 ## 1.0.3
 * fix [#165](https://github.com/crazecoder/flutter_bugly/issues/165)
 ## 1.0.2

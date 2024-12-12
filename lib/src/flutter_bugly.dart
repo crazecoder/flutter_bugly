@@ -24,6 +24,7 @@ class FlutterBugly {
     String? deviceId, // 设备id
     String? appVersion, // App版本
     String? userId, // 用户标识
+    bool debugMode = kDebugMode, //开启SDK日志
     //android
     int initDelay = 0, // 延迟初始化，单位秒
     String? deviceModel, // 设备型号
@@ -34,7 +35,6 @@ class FlutterBugly {
     double blockMonitorTimeout = 3, //卡顿阀值
     bool unexpectedTerminatingDetectionEnable = true, //非正常退出事件(SIGKILL)
     bool enableBlockMonitor = true, //卡顿监控
-    bool debugMode = false, //开启SDK日志
     bool symbolicateInProcessEnable = true, //进程内还原符号
   }) async {
     assert(
@@ -49,6 +49,7 @@ class FlutterBugly {
       "deviceId": deviceId,
       "appVersion": appVersion,
       "userId": userId,
+      "debugMode": debugMode,
       //android
       "deviceModel": deviceModel,
       "initDelay": initDelay,
@@ -60,7 +61,6 @@ class FlutterBugly {
       "unexpectedTerminatingDetectionEnable":
           unexpectedTerminatingDetectionEnable,
       "enableBlockMonitor": enableBlockMonitor,
-      "debugMode": debugMode,
       "symbolicateInProcessEnable": symbolicateInProcessEnable,
     };
     final dynamic result = await _channel.invokeMethod('initBugly', map);
@@ -161,6 +161,7 @@ class FlutterBugly {
       details,
     )) {
       uploadException(
+          type: details.exception.runtimeType.toString(),
           message: details.exception.toString(),
           detail: details.stack.toString());
     }
@@ -199,11 +200,13 @@ class FlutterBugly {
   static Future<Null> uploadException({
     required String message,
     required String detail,
+    String? type,
     Map? data,
   }) async {
     var map = {};
     map.putIfAbsent("crash_message", () => message);
     map.putIfAbsent("crash_detail", () => detail);
+    map.putIfAbsent("crash_type", () => type);
     if (data != null) map.putIfAbsent("crash_data", () => data);
     await _channel.invokeMethod('postCatchedException', map);
   }
@@ -219,7 +222,7 @@ class FlutterBugly {
     Map<String, Object> map = {"deviceModel": deviceModel};
     await _channel.invokeMethod('setDeviceModel', map);
   }
-  
+
   /// 设置App包名 ,单独设置方法仅android可用
   static Future<Null> setAppPackageName(String appPackage) async {
     Map<String, Object> map = {"appPackage": appPackage};

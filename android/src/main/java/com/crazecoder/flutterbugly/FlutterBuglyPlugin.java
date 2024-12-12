@@ -11,7 +11,8 @@ import com.crazecoder.flutterbugly.utils.JsonUtil;
 import com.crazecoder.flutterbugly.utils.MapUtil;
 import com.tencent.bugly.crashreport.CrashReport;
 
-import io.flutter.BuildConfig;
+import java.util.Map;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -61,7 +62,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                     boolean enableRecordAnrMainStack = call.argument("enableRecordAnrMainStack");
                     strategy.setEnableRecordAnrMainStack(enableRecordAnrMainStack);
                 }
-                CrashReport.initCrashReport(activity.getApplicationContext(), appId, BuildConfig.DEBUG);
+                CrashReport.initCrashReport(activity.getApplicationContext(), appId, Boolean.TRUE.equals(call.argument("debugMode")),strategy);
 
                 result(getResultBean(true, appId, "Bugly 初始化成功"));
             } else {
@@ -197,17 +198,24 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
     }
 
     private void postException(MethodCall call) {
+        String type = null;
         String message = "";
         String detail = null;
+        Map<String, String> data = null;
+        if (call.hasArgument("crash_type")) {
+            type = call.argument("crash_type");
+        }
         if (call.hasArgument("crash_message")) {
             message = call.argument("crash_message");
         }
         if (call.hasArgument("crash_detail")) {
             detail = call.argument("crash_detail");
         }
+        if (call.hasArgument("crash_data")) {
+            data = call.argument("crash_data");
+        }
         if (TextUtils.isEmpty(detail)) return;
-        CrashReport.postException(8, "Flutter Exception", message, detail, null);
-
+        CrashReport.postException(8, TextUtils.isEmpty(type) ? message : type, message, detail, data);
     }
 
     private void result(Object object) {
