@@ -31,6 +31,17 @@ dependencies:
 ```
 
 ## 二、项目配置
+如果iOS报错building for iOS Simulator, but linking in object file built for iOS时，在 `ios/Podfile` 的 post_install 下加入:
+```
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
+  end
+end
+```
 
 在 `android/app/build.gradle` 的 android 下加入:
 
