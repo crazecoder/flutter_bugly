@@ -41,7 +41,6 @@ class FlutterBugly {
       (Platform.isAndroid && androidAppId != null) ||
           (Platform.isIOS && iOSAppId != null),
     );
-    assert(debugMode = true);
     assert(_postCaught, 'Run postCatchedException first.');
     Map<String, Object?> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
@@ -105,8 +104,6 @@ class FlutterBugly {
     String? filterRegExp,
     bool debugUpload = false,
   }) {
-    bool _isDebug = false;
-    assert(_isDebug = true);
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
@@ -138,7 +135,6 @@ class FlutterBugly {
     }, (error, stackTrace) {
       _filterAndUploadException(
         debugUpload,
-        _isDebug,
         onException,
         filterRegExp,
         FlutterErrorDetails(exception: error, stack: stackTrace),
@@ -148,14 +144,12 @@ class FlutterBugly {
 
   static void _filterAndUploadException(
     debugUpload,
-    _isDebug,
     handler,
     filterRegExp,
     FlutterErrorDetails details,
   ) {
     if (!_filterException(
       debugUpload,
-      _isDebug,
       handler,
       filterRegExp,
       details,
@@ -169,7 +163,6 @@ class FlutterBugly {
 
   static bool _filterException(
     bool debugUpload,
-    bool _isDebug,
     FlutterExceptionHandler? handler,
     String? filterRegExp,
     FlutterErrorDetails details,
@@ -180,7 +173,7 @@ class FlutterBugly {
       FlutterError.onError?.call(details);
     }
     // Debug 时默认不上传异常。
-    if (!debugUpload && _isDebug) {
+    if (!debugUpload && kDebugMode) {
       return true;
     }
     // 异常过滤。
