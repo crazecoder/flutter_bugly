@@ -1,3 +1,5 @@
+## 1.0.5
+* 使用kDebugMode替代assert判断，debugMode可以控制是否启用bugly的debug模式
 ## 1.0.4
 * uploadException方法新增type参数，推荐传exception.runtimeType.toString()，不传默认取message内容
 * [Android] 生效debugMode参数
