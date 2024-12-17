@@ -4,6 +4,7 @@ import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bugly/src/types/log_level.dart';
 import 'dart:convert';
 import 'bean/init_result_info.dart';
 
@@ -232,6 +233,20 @@ class FlutterBugly {
   static Future<Null> setDeviceID(String deviceId) async {
     Map<String, Object> map = {"deviceId": deviceId};
     await _channel.invokeMethod('setDeviceID', map);
+  }
+
+  /// 设置用户标识
+  static Future<Null> log({
+    required String tag,
+    required String message,
+    LogLevel level = LogLevel.INFO,
+  }) async {
+    Map<String, Object> map = {
+      "log_level": level.index + 1,
+      "log_tag": tag,
+      "log_message": message
+    };
+    await _channel.invokeMethod('log', map);
   }
 
   static void dispose() {

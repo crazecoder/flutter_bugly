@@ -7,8 +7,10 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.crazecoder.flutterbugly.bean.BuglyInitResultInfo;
+import com.crazecoder.flutterbugly.types.LogLevel;
 import com.crazecoder.flutterbugly.utils.JsonUtil;
 import com.crazecoder.flutterbugly.utils.MapUtil;
+import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Map;
@@ -105,6 +107,9 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
             result(null);
         } else if (call.method.equals("postCatchedException")) {
             postException(call);
+            result(null);
+        }else if (call.method.equals("log")) {
+            log(call);
             result(null);
         } else {
             result.notImplemented();
@@ -216,6 +221,40 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         }
         if (TextUtils.isEmpty(detail)) return;
         CrashReport.postException(8, TextUtils.isEmpty(type) ? message : type, message, detail, data);
+    }
+
+    private void log(MethodCall call) {
+        int level = 0;
+        String tag = null;
+        String message = null;
+        if (call.hasArgument("log_level")) {
+            level = call.argument("log_level");
+        }
+        if (call.hasArgument("log_tag")) {
+            tag = call.argument("log_tag");
+        }
+        if (call.hasArgument("log_message")) {
+            message = call.argument("log_message");
+        }
+        switch (level) {
+            case LogLevel.ERROR:
+                BuglyLog.e(tag, message);
+                break;
+            case LogLevel.WARN:
+                BuglyLog.w(tag, message);
+                break;
+            case LogLevel.INFO:
+                BuglyLog.i(tag, message);
+                break;
+            case LogLevel.DEBUG:
+                BuglyLog.d(tag, message);
+                break;
+            case LogLevel.VERBOSE:
+                BuglyLog.v(tag, message);
+                break;
+            default:
+                break;
+        }
     }
 
     private void result(Object object) {

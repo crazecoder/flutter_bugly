@@ -23,7 +23,7 @@
           [self debugMode:call config:config];
           [self symbolicateInProcessEnable:call config:config];
           [Bugly startWithAppId:appId config:config];
-          NSLog(@"Bugly appId: %@", appId);
+          BLYLogError(@"Bugly appId: %@", appId);
 
           NSDictionary * dict = @{@"message":@"Bugly 初始化成功",@"appId":appId, @"isSuccess":@YES};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
@@ -82,6 +82,12 @@
           [Bugly setUserValue:value forKey:key];
       }
       result(nil);
+  }else if([@"log" isEqualToString:call.method]){
+      NSNumber *level = call.arguments[@"log_level"];
+      NSString *tag = call.arguments[@"log_tag"];
+      NSString *message = call.arguments[@"log_message"];
+      [self log:level tag:tag message:message];
+      result(nil);
   }else {
       result(FlutterMethodNotImplemented);
   }
@@ -135,6 +141,34 @@
 - (void) symbolicateInProcessEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
     BOOL symbolicateInProcessEnable = [call.arguments[@"symbolicateInProcessEnable"] boolValue];
     config.symbolicateInProcessEnable = symbolicateInProcessEnable;
+}
+
+- (void) log:(NSNumber*)level tag:(NSString*)tag message:(NSString*)message{
+    NSInteger anInteger = 0;
+    if (level!=nil) {
+        anInteger = [level integerValue];
+    }
+    switch (anInteger) {
+        case (long)BuglyLogLevelVerbose:
+            [BuglyLog level:BuglyLogLevelVerbose tag:tag log:@"%@", message];
+            break;
+        case (long)BuglyLogLevelError:
+            [BuglyLog level:BuglyLogLevelError tag:tag log:@"%@", message];
+            break;
+        case (long)BuglyLogLevelWarn:
+            [BuglyLog level:BuglyLogLevelWarn tag:tag log:@"%@", message];
+            break;
+        case (long)BuglyLogLevelInfo:
+            [BuglyLog level:BuglyLogLevelInfo tag:tag log:@"%@", message];
+            break;
+        case (long)BuglyLogLevelDebug:
+            [BuglyLog level:BuglyLogLevelDebug tag:tag log:@"%@", message];
+            break;
+        default:
+            [BuglyLog level:BuglyLogLevelSilent tag:tag log:@"%@", message];
+            break;
+    }
+    
 }
 
 - (BOOL) isBlankString:(NSString *)string {
