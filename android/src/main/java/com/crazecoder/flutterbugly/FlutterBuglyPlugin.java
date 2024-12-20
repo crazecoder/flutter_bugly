@@ -15,6 +15,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Map;
 
+import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -64,8 +65,15 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
                     boolean enableRecordAnrMainStack = call.argument("enableRecordAnrMainStack");
                     strategy.setEnableRecordAnrMainStack(enableRecordAnrMainStack);
                 }
-                CrashReport.initCrashReport(activity.getApplicationContext(), appId, Boolean.TRUE.equals(call.argument("debugMode")),strategy);
-
+                if (call.hasArgument("isBuglyLogUpload")) {
+                    boolean isBuglyLogUpload = call.argument("isBuglyLogUpload");
+                    strategy.setBuglyLogUpload(isBuglyLogUpload);
+                }
+                boolean debugMode = Boolean.TRUE.equals(call.argument("debugMode"));
+                CrashReport.initCrashReport(activity.getApplicationContext(), appId, debugMode, strategy);
+                if (debugMode) {
+                    Log.i("FlutterBugly", "Bugly appId: " + appId);
+                }
                 result(getResultBean(true, appId, "Bugly 初始化成功"));
             } else {
                 result(getResultBean(false, null, "Bugly appId不能为空"));
@@ -108,7 +116,7 @@ public class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHandler, Act
         } else if (call.method.equals("postCatchedException")) {
             postException(call);
             result(null);
-        }else if (call.method.equals("log")) {
+        } else if (call.method.equals("log")) {
             log(call);
             result(null);
         } else {

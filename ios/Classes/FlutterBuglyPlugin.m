@@ -22,9 +22,11 @@
           [self blockMonitorEnable:call config:config];
           [self debugMode:call config:config];
           [self symbolicateInProcessEnable:call config:config];
+          [self setReportLogLevel:call config:config];
           [Bugly startWithAppId:appId config:config];
-          BLYLogError(@"Bugly appId: %@", appId);
-
+          if (config.debugMode) {
+              NSLog(@"Bugly appId: %@", appId);
+          }
           NSDictionary * dict = @{@"message":@"Bugly 初始化成功",@"appId":appId, @"isSuccess":@YES};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
           NSString * json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -141,6 +143,14 @@
 - (void) symbolicateInProcessEnable:(FlutterMethodCall*)call config:(BuglyConfig*) config{
     BOOL symbolicateInProcessEnable = [call.arguments[@"symbolicateInProcessEnable"] boolValue];
     config.symbolicateInProcessEnable = symbolicateInProcessEnable;
+}
+
+- (void) setReportLogLevel:(FlutterMethodCall*)call config:(BuglyConfig*) config{
+    NSNumber *level = call.arguments[@"reportLogLevel"];
+    if (level!=nil) {
+        NSInteger anInteger = [level integerValue];
+        config.reportLogLevel = anInteger;
+    }
 }
 
 - (void) log:(NSNumber*)level tag:(NSString*)tag message:(NSString*)message{

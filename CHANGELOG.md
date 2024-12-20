@@ -1,3 +1,11 @@
+## 1.0.7
+* 由于Zone mismatch，删除'Run postCatchedException first.'的assert代码，同时删除dispose方法
+* 插件内增加平台判断方法，在不支持的平台上无需自己处理
+* [iOS] 初始化新增reportLogLevel参数，控制自定义日志上报的级别
+* [Android] 初始化新增isBuglyLogUpload参数，控制自定义日志是否上报
+* [Android] 升级gradle版本
+## 1.0.6
+* 新增FlutterBugly.log()方法
 ## 1.0.5
 * 使用kDebugMode替代assert判断，debugMode可以控制是否启用bugly的debug模式
 ## 1.0.4

@@ -15,8 +15,6 @@ class FlutterBugly {
     'crazecoder/flutter_bugly',
   );
 
-  static bool _postCaught = false;
-
   /// 初始化
   static Future<InitResultInfo> init({
     String? androidAppId,
@@ -32,16 +30,22 @@ class FlutterBugly {
     String? appPackage, // App包名
     bool enableCatchAnrTrace = false, //设置anr时是否获取系统trace文件，默认为false
     bool enableRecordAnrMainStack = true, //设置是否获取anr过程中的主线程堆栈，默认为true
+    bool isBuglyLogUpload = true, //设置是否上传自定义日志到bugly，默认为true
     //iOS
     double blockMonitorTimeout = 3, //卡顿阀值
     bool unexpectedTerminatingDetectionEnable = true, //非正常退出事件(SIGKILL)
     bool enableBlockMonitor = true, //卡顿监控
     bool symbolicateInProcessEnable = true, //进程内还原符号
+    int? reportLogLevel, // 设置自定义日志上报的级别，默认不上报自定义日志
   }) async {
     assert(
       (Platform.isAndroid && androidAppId != null) ||
           (Platform.isIOS && iOSAppId != null),
     );
+    if (!_isSupportPlatform()) {
+      return InitResultInfo.fromJson(
+          {"isSuccess": false, "appId": null, "message": "当前平台不支持"});
+    }
     Map<String, Object?> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "channel": channel,
@@ -55,12 +59,14 @@ class FlutterBugly {
       "appPackage": appPackage,
       "enableCatchAnrTrace": enableCatchAnrTrace,
       "enableRecordAnrMainStack": enableRecordAnrMainStack,
+      "isBuglyLogUpload": isBuglyLogUpload,
       //iOS
       "blockMonitorTimeout": blockMonitorTimeout,
       "unexpectedTerminatingDetectionEnable":
           unexpectedTerminatingDetectionEnable,
       "enableBlockMonitor": enableBlockMonitor,
       "symbolicateInProcessEnable": symbolicateInProcessEnable,
+      "reportLogLevel": reportLogLevel,
     };
     final dynamic result = await _channel.invokeMethod('initBugly', map);
     Map resultMap = json.decode(result);
@@ -70,6 +76,9 @@ class FlutterBugly {
 
   /// 设置用户标识
   static Future<Null> setUserId(String userId) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"userId": userId};
     await _channel.invokeMethod('setUserId', map);
   }
@@ -77,6 +86,9 @@ class FlutterBugly {
   /// 设置标签
   /// [userSceneTag] 标签 ID，可在网站生成
   static Future<Null> setUserTag(int userSceneTag) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"userTag": userSceneTag};
     await _channel.invokeMethod('setUserTag', map);
   }
@@ -86,6 +98,9 @@ class FlutterBugly {
     required String key,
     required String value,
   }) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     assert(key.isNotEmpty);
     assert(value.isNotEmpty);
     Map<String, Object> map = {"key": key, "value": value};
@@ -104,6 +119,10 @@ class FlutterBugly {
     String? filterRegExp,
     bool debugUpload = false,
   }) {
+    if (!_isSupportPlatform()) {
+      callback();
+      return;
+    }
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
@@ -118,7 +137,6 @@ class FlutterBugly {
         FlutterError.presentError(details);
       }
     };
-    _postCaught = true;
     // This creates a [Zone] that contains the Flutter application and stablishes
     // an error handler that captures errors and reports them.
     //
@@ -196,6 +214,9 @@ class FlutterBugly {
     String? type,
     Map? data,
   }) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     var map = {};
     map.putIfAbsent("crash_message", () => message);
     map.putIfAbsent("crash_detail", () => detail);
@@ -206,30 +227,45 @@ class FlutterBugly {
 
   /// 自定义渠道标识 ,单独设置方法仅android可用
   static Future<Null> setAppChannel(String channel) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"channel": channel};
     await _channel.invokeMethod('setAppChannel', map);
   }
 
   /// 设置设备型号 ,单独设置方法仅android可用
   static Future<Null> setDeviceModel(String deviceModel) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"deviceModel": deviceModel};
     await _channel.invokeMethod('setDeviceModel', map);
   }
 
   /// 设置App包名 ,单独设置方法仅android可用
   static Future<Null> setAppPackageName(String appPackage) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"appPackage": appPackage};
     await _channel.invokeMethod('setAppPackageName', map);
   }
 
   /// 设置App版本
   static Future<Null> setAppVersion(String appVersion) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"appVersion": appVersion};
     await _channel.invokeMethod('setAppVersion', map);
   }
 
   /// 设置设备id ,单独设置方法仅android可用
   static Future<Null> setDeviceID(String deviceId) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {"deviceId": deviceId};
     await _channel.invokeMethod('setDeviceID', map);
   }
@@ -240,6 +276,9 @@ class FlutterBugly {
     required String message,
     LogLevel level = LogLevel.INFO,
   }) async {
+    if (!_isSupportPlatform()) {
+      return;
+    }
     Map<String, Object> map = {
       "log_level": level.index + 1,
       "log_tag": tag,
@@ -248,7 +287,7 @@ class FlutterBugly {
     await _channel.invokeMethod('log', map);
   }
 
-  static void dispose() {
-    _postCaught = false;
+  static bool _isSupportPlatform() {
+    return Platform.isAndroid || Platform.isIOS;
   }
 }

@@ -87,6 +87,8 @@ void main() {
     );
   });
 }
+//bugly日志
+FlutterBugly.log(tag: tag, message: message,level:LogLevel.INFO);
 ```
 
 ## 四、release打包（Android）
