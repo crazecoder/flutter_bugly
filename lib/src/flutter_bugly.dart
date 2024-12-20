@@ -42,7 +42,6 @@ class FlutterBugly {
       (Platform.isAndroid && androidAppId != null) ||
           (Platform.isIOS && iOSAppId != null),
     );
-    assert(_postCaught, 'Run postCatchedException first.');
     Map<String, Object?> map = {
       "appId": Platform.isAndroid ? androidAppId : iOSAppId,
       "channel": channel,
