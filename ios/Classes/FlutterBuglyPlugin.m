@@ -147,7 +147,7 @@
 
 - (void) setReportLogLevel:(FlutterMethodCall*)call config:(BuglyConfig*) config{
     NSNumber *level = call.arguments[@"reportLogLevel"];
-    if (level!=nil) {
+    if (level!=nil&&![level isEqual:[NSNull null]]) {
         NSInteger anInteger = [level integerValue];
         config.reportLogLevel = anInteger;
     }
