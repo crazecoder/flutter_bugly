@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "flutter_bugly",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ]
+  }
+}

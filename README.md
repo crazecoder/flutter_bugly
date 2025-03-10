@@ -3,7 +3,7 @@
 [![Bugly Play package](https://img.shields.io/pub/v/flutter_bugly_play?label=bugly_play)](https://pub.dev/packages/flutter_bugly)
 [![Discord](https://img.shields.io/badge/discord-FlutterDev-blue.svg)](https://discord.gg/q6yFDws3Xc)
 
-腾讯 Bugly 插件，支持Android/iOS 运营统计、原生异常上报、flutter 异常上报。应用更新可以使用[pgyer_updater](https://github.com/crazecoder/pgyer_updater)
+腾讯 Bugly 插件，支持Android/iOS/OpenHarmoy 运营统计、原生异常上报、flutter 异常上报。应用更新可以使用[pgyer_updater](https://github.com/crazecoder/pgyer_updater)
 
 ---
 
@@ -72,6 +72,9 @@ void main() {
     FlutterBugly.init(
       androidAppId: "your android app id",
       iOSAppId: "your iOS app id",
+      ohosAppId: "your ohos app id",
+      deviceId: "your ohos device id",
+      appKey: "your ohos bugly app key",
     );
   });
 

@@ -20,3 +20,5 @@ flutter:
         pluginClass: FlutterBuglyPlugin
       ios:
         pluginClass: FlutterBuglyPlugin
+      ohos:
+        pluginClass: FlutterBuglyPlugin

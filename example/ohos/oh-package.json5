@@ -1,0 +1,22 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "example_example",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@ohos/flutter_ohos": "file:./har/flutter.har",
+    "bugly": "^0.3.7"
+  },
+  "devDependencies": {
+    "@ohos/hypium": "1.0.6"
+  },
+  "overrides": {
+    "@ohos/flutter_ohos": "file:./har/flutter.har",
+    "flutter_bugly": "file:./har/flutter_bugly.har",
+    "@ohos/flutter_module": "file:./entry"
+  },
+  "dynamicDependencies": {}
+}

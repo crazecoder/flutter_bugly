@@ -1,0 +1,14 @@
+{
+  "name": "flutter_bugly",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ohos/flutter_ohos": "file:./har/flutter.har",
+    "bugly": "^0.3.7"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}
