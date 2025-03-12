@@ -21,7 +21,7 @@ class FlutterBugly {
     String? iOSAppId,
     String? ohosAppId,
     String? channel, // 自定义渠道标识
-    String? deviceId, // 设备id
+    String? deviceId, // 设备id，鸿蒙为必传参数
     String? appVersion, // App版本
     String? userId, // 用户标识
     bool debugMode = kDebugMode, //开启SDK日志
@@ -39,9 +39,8 @@ class FlutterBugly {
     bool symbolicateInProcessEnable = true, //进程内还原符号
     int? reportLogLevel, // 设置自定义日志上报的级别，默认不上报自定义日志
     //ohos
-    String? appKey,
+    String? appKey,//必传参数
     String? buildNum,
-    String? appChannel,
   }) async {
     assert(
       (Platform.isAndroid && androidAppId != null) ||
@@ -76,7 +75,6 @@ class FlutterBugly {
       //ohos
       "appKey": appKey,
       "buildNum": buildNum,
-      "appChannel": appChannel,
     };
     final dynamic result = await _channel.invokeMethod('initBugly', map);
     Map resultMap = json.decode(result);
@@ -299,12 +297,11 @@ class FlutterBugly {
     await _channel.invokeMethod('log', map);
   }
 
-  /// 判断是否是支持的平台
-
   static bool isOhos() {
     return Platform.operatingSystem == 'ohos';
   }
 
+  /// 判断是否是支持的平台
   static bool _isSupportPlatform() {
     return Platform.isAndroid || Platform.isIOS || isOhos();
   }
