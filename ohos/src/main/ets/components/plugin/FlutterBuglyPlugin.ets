@@ -102,8 +102,8 @@ export default class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHand
     }
 
     // 选填，业务 App 渠道
-    if (call.hasArgument("appChannel")) {
-      builder.appChannel = call.argument("appChannel") as string;
+    if (call.hasArgument("channel")) {
+      builder.appChannel = call.argument("channel") as string;
     } else {
       builder.appChannel = "website";
     }
