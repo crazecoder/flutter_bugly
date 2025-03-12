@@ -19,6 +19,7 @@ class FlutterBugly {
   static Future<InitResultInfo> init({
     String? androidAppId,
     String? iOSAppId,
+    String? ohosAppId,
     String? channel, // 自定义渠道标识
     String? deviceId, // 设备id
     String? appVersion, // App版本
@@ -37,17 +38,22 @@ class FlutterBugly {
     bool enableBlockMonitor = true, //卡顿监控
     bool symbolicateInProcessEnable = true, //进程内还原符号
     int? reportLogLevel, // 设置自定义日志上报的级别，默认不上报自定义日志
+    //ohos
+    String? appKey,
+    String? buildNum,
+    String? appChannel,
   }) async {
     assert(
       (Platform.isAndroid && androidAppId != null) ||
-          (Platform.isIOS && iOSAppId != null),
+          (Platform.isIOS && iOSAppId != null)||
+          (isOhos() && ohosAppId != null && appKey != null && deviceId != null),
     );
     if (!_isSupportPlatform()) {
       return InitResultInfo.fromJson(
           {"isSuccess": false, "appId": null, "message": "当前平台不支持"});
     }
     Map<String, Object?> map = {
-      "appId": Platform.isAndroid ? androidAppId : iOSAppId,
+      "appId": Platform.isAndroid ? androidAppId : (Platform.isIOS ? iOSAppId : ohosAppId),
       "channel": channel,
       "deviceId": deviceId,
       "appVersion": appVersion,
@@ -67,6 +73,10 @@ class FlutterBugly {
       "enableBlockMonitor": enableBlockMonitor,
       "symbolicateInProcessEnable": symbolicateInProcessEnable,
       "reportLogLevel": reportLogLevel,
+      //ohos
+      "appKey": appKey,
+      "buildNum": buildNum,
+      "appChannel": appChannel,
     };
     final dynamic result = await _channel.invokeMethod('initBugly', map);
     Map resultMap = json.decode(result);
@@ -179,6 +189,8 @@ class FlutterBugly {
     }
   }
 
+  static void dispose(){}
+
   static bool _filterException(
     bool debugUpload,
     FlutterExceptionHandler? handler,
@@ -287,7 +299,15 @@ class FlutterBugly {
     await _channel.invokeMethod('log', map);
   }
 
-  static bool _isSupportPlatform() {
-    return Platform.isAndroid || Platform.isIOS;
+  /// 判断是否是支持的平台
+
+  static bool isOhos() {
+    return Platform.operatingSystem == 'ohos';
   }
+
+  static bool _isSupportPlatform() {
+    return Platform.isAndroid || Platform.isIOS || isOhos();
+  }
+
+
 }
