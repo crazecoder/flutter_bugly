@@ -1,3 +1,7 @@
+## 1.1.0
+* 新增鸿蒙os支持，来自[@MTChannn](https://github.com/MTChannn)
+## 1.0.7+1
+* [iOS]修复空判断导致的闪退问题
 ## 1.0.7
 * 由于Zone mismatch，删除'Run postCatchedException first.'的assert代码，同时删除dispose方法
 * 插件内增加平台判断方法，在不支持的平台上无需自己处理
