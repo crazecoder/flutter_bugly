@@ -57,8 +57,8 @@ export default class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHand
         this.setUserId(call, result);
         break;
 
-      case "setDeviceId":
-        this.setDeviceId(call, result);
+      case "setDeviceID":
+        this.setDeviceID(call, result);
         break;
       
       case "setDeviceModel":
@@ -148,7 +148,7 @@ export default class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHand
   }
 
   // 设置设备ID
-  private setDeviceId(call: MethodCall, result: MethodResult): void {
+  private setDeviceID(call: MethodCall, result: MethodResult): void {
     const deviceId = call.argument("deviceId") as string;
     Bugly.updateDeviceId(deviceId);
     result.success(null);
