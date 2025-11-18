@@ -136,8 +136,17 @@ export default class FlutterBuglyPlugin implements FlutterPlugin, MethodCallHand
       builder.initDelay = 0;
     }
 
-    await Bugly.init(getContext(this), builder);   // 如果需等待Bugly完全初始化完成，使用await Bugly.init(context, builder);
-    result.success("Bugly initialization successful");
+    await Bugly.init(getContext(this), builder);   // 如果需等待Bugly完全初始化完成，使用await Bugly.init(context, builder)
+
+    result.success(this.getResultBean(true, builder.appId, "Bugly 初始化成功"));
+  }
+
+  private getResultBean(isSuccess: boolean, appid: string, msg: string) {
+    return JSON.stringify({
+      isSuccess: isSuccess,
+      appId: appid,
+      message: msg
+    });
   }
 
   // 设置用户 ID
