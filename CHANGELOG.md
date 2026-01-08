@@ -1,3 +1,6 @@
+## 1.1.1
+* 优化ohos下initbugly的返回参数，来自[@xiaolieask](https://github.com/xiaolieask)
+* 修复无法修改deviceId的问题，来自[@LalHan](https://github.com/LalHan)
 ## 1.1.0
 * 新增鸿蒙os支持，来自[@MTChannn](https://github.com/MTChannn)
 ## 1.0.7+1
